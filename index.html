@@ -923,13 +923,13 @@ Be highly objective, analytical, and precise. Every identified risk must have an
 
         // Validate that returned data satisfies standard schema attributes
         if (!structuredResults.contractType || typeof structuredResults.overallRiskScore === 'undefined') {
-          showNotification("Make.com payload is incomplete. Direct client-side audit completed instead.", "warning");
+          showNotification("payload is incomplete. Direct client-side audit completed instead.", "warning");
           structuredResults = await runClientSideAudit(contractText);
         }
         
         resetSecondaryPanels(structuredResults.contractType);
         renderResults(structuredResults);
-        showToast("Make.com Pipeline Audit Completed!");
+        showToast(" Audit Completed!");
 
       } catch (error) {
         document.getElementById('state-loading').classList.add('hidden');
@@ -937,7 +937,7 @@ Be highly objective, analytical, and precise. Every identified risk must have an
 
         document.getElementById('modal-title').textContent = "Pipeline Integration Warning";
         document.getElementById('modal-description').innerHTML = `
-          An error occurred while calling your custom Make.com pipeline.
+          An error occurred while calling your custom pipeline.
           <br><br>
           <span class="text-xs text-rose-300">Technical Details: ${error.message}</span>
           <br><br>
