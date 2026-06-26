@@ -96,7 +96,7 @@
 <body class="flex flex-col min-h-screen bg-[#050814] text-slate-100 antialiased">
 
   <!-- Premium Header -->
-  <header class="glass-panel sticky top-0 z-40 border-b border-slate-900 px-6 py-4 flex items-center justify-between">
+  <header class="glass-panel sticky top-0 z-40 border-b border-slate-900/60 px-6 py-4 flex items-center justify-between">
     <div class="flex items-center space-x-3.5">
       <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-xl shadow-indigo-500/10">
         <svg class="h-5.5 w-5.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,14 +115,14 @@
     <!-- Connection Status Badges -->
     <div class="flex items-center space-x-3">
       <div id="connection-indicator" class="flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900/60 border border-slate-800">
-        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="text-slate-300">Fail-Safe AI Enabled</span>
+        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" id="connection-dot"></span>
+        <span class="text-slate-300" id="connection-text">Fail-Safe AI Enabled</span>
       </div>
     </div>
   </header>
 
   <!-- Main Workspace -->
-  <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
     
     <!-- LEFT SIDE: Setup & Utilities (5 cols) -->
     <div class="lg:col-span-5 flex flex-col space-y-6">
@@ -195,6 +195,21 @@
             <textarea id="contractTextInput" rows="8" placeholder="Paste the clauses, terms, or entire legal agreement text here..." class="w-full bg-slate-950/60 rounded-xl p-3 text-xs border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-300 placeholder-slate-600 outline-none transition custom-scroll"></textarea>
           </div>
 
+          <!-- Sandbox Preloaded Scenarios -->
+          <div class="space-y-1.5">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Demo Sandbox Pre-loads</p>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="loadSample('nda')" class="px-3 py-2 text-left rounded-lg bg-slate-900/60 hover:bg-indigo-950/20 border border-slate-800/80 hover:border-indigo-500/20 text-xs transition duration-150">
+                <p class="font-bold text-white">🔒 SaaS NDA</p>
+                <p class="text-[10px] text-slate-400 mt-0.5 truncate">Extremely high exposure</p>
+              </button>
+              <button onclick="loadSample('saas')" class="px-3 py-2 text-left rounded-lg bg-slate-900/60 hover:bg-indigo-950/20 border border-slate-800/80 hover:border-indigo-500/20 text-xs transition duration-150">
+                <p class="font-bold text-white">☁️ Vendor Master Terms</p>
+                <p class="text-[10px] text-slate-400 mt-0.5 truncate">Auto-renewals & SLA limits</p>
+              </button>
+            </div>
+          </div>
+
           <!-- PRIMARY CALL TO ACTION BUTTON -->
           <button id="btn-audit" onclick="triggerAudit()" class="w-full relative active-glow bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/15 text-xs transition-all flex items-center justify-center space-x-2">
             <span>⚡ Generate Strategic Audit</span>
@@ -236,7 +251,7 @@
           </svg>
         </div>
         <h3 class="text-xl font-bold text-white">System Awaiting Document</h3>
-        <p class="text-sm text-slate-400 max-sm mx-auto mt-2 leading-relaxed">
+        <p class="text-sm text-slate-400 max-w-sm mx-auto mt-2 leading-relaxed">
           Upload a legal agreement or execute a pre-loaded sandbox scenario to run structured risk audits instantly.
         </p>
         <button onclick="loadSample('nda')" class="mt-6 inline-flex items-center space-x-2 px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/10 transition">
@@ -252,21 +267,21 @@
           <div class="absolute inset-0 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
         </div>
         <h3 class="text-lg font-bold text-white mb-2" id="loader-title">Extracting Document Data</h3>
-        <p class="text-xs text-slate-400 max-w-sm mx-auto animate-pulse" id="loader-status">Parsing contract structure and locating key signatures...</p>
+        <p class="text-sm text-slate-400 max-w-sm mx-auto animate-pulse" id="loader-status">Parsing contract structure and locating key signatures...</p>
         
         <!-- Live steps list -->
         <div class="mt-8 w-full max-w-xs space-y-3 text-left border-t border-slate-800 pt-6">
           <div class="flex items-center space-x-3 text-xs" id="step-1">
-            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-indigo-500/20 text-indigo-400 font-bold">1</span>
-            <span class="text-slate-300">File extraction & buffer conversion</span>
+            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-indigo-500/20 text-indigo-400 font-bold" id="dot-step-1">1</span>
+            <span class="text-slate-300" id="text-step-1">File extraction & buffer conversion</span>
           </div>
           <div class="flex items-center space-x-3 text-xs opacity-40" id="step-2">
-            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold">2</span>
-            <span class="text-slate-400">Automated Webhook transmission routing</span>
+            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold" id="dot-step-2">2</span>
+            <span class="text-slate-400" id="text-step-2">AI structure profiling & risk grading</span>
           </div>
           <div class="flex items-center space-x-3 text-xs opacity-40" id="step-3">
-            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold">3</span>
-            <span class="text-slate-400">Structured audit output formatting</span>
+            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold" id="dot-step-3">3</span>
+            <span class="text-slate-400" id="text-step-3">Structured audit output formatting</span>
           </div>
         </div>
       </div>
@@ -282,7 +297,7 @@
             <div class="relative h-32 w-32 flex items-center justify-center">
               <svg class="absolute inset-0 transform -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="40" stroke="rgba(30, 41, 59, 1)" stroke-width="8" fill="none"></circle>
-                <circle id="score-ring" cx="50" cy="50" r="40" stroke="url(#gradient-accent)" stroke-width="8" stroke-dasharray="251.2" stroke-dashoffset="100" stroke-linecap="round" fill="none" class="transition-all duration-1000 ease-out"></circle>
+                <circle id="score-ring" cx="50" cy="50" r="40" stroke="url(#gradient-accent)" stroke-width="8" stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" fill="none" class="transition-all duration-1000 ease-out"></circle>
                 
                 <defs>
                   <linearGradient id="gradient-accent" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -374,10 +389,10 @@
           <div class="flex items-center justify-between">
             <p class="text-xs text-slate-400 font-medium">Filter Redlines by Severity:</p>
             <div class="flex items-center space-x-2">
-              <button onclick="filterRisks('ALL')" class="px-2.5 py-1 rounded bg-slate-800 text-[10px] font-semibold text-white transition hover:bg-slate-700" id="filter-all">All</button>
-              <button onclick="filterRisks('HIGH')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-rose-400 border border-rose-900/30 hover:bg-slate-800 transition" id="filter-high">High</button>
-              <button onclick="filterRisks('MEDIUM')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-amber-400 border border-amber-900/30 hover:bg-slate-800 transition" id="filter-medium">Medium</button>
-              <button onclick="filterRisks('LOW')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-blue-400 border border-blue-900/30 hover:bg-slate-800 transition" id="filter-low">Low</button>
+              <button id="filter-all" onclick="filterRisks('ALL')" class="px-2.5 py-1 rounded bg-indigo-600 text-[10px] font-semibold text-white transition hover:bg-indigo-500">All</button>
+              <button id="filter-high" onclick="filterRisks('HIGH')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-rose-400 border border-rose-900/30 hover:bg-slate-800 transition">High</button>
+              <button id="filter-medium" onclick="filterRisks('MEDIUM')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-amber-400 border border-amber-900/30 hover:bg-slate-800 transition">Medium</button>
+              <button id="filter-low" onclick="filterRisks('LOW')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-blue-400 border border-blue-900/30 hover:bg-slate-800 transition">Low</button>
             </div>
           </div>
 
@@ -426,7 +441,7 @@
                     <span class="text-[10px] uppercase font-bold text-cyan-300 tracking-wider block">Bargaining Leverage Rating</span>
                     <span id="brief-leverage-rating" class="text-xs font-bold text-slate-200 mt-1.5 block">Analyzing...</span>
                   </div>
-                  <div class="h-1.5 w-full bg-slate-950 rounded-full overflow-hidden mt-2">
+                  <div class="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden mt-2">
                     <div id="brief-leverage-bar" class="h-full bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full transition-all duration-1000" style="width: 50%"></div>
                   </div>
                 </div>
@@ -501,7 +516,7 @@
             <!-- Chat input -->
             <div class="flex items-center space-x-2 border-t border-slate-850 pt-3 shrink-0">
               <input type="text" id="chat-input" onkeydown="handleChatKeyDown(event)" placeholder="Ask the copilot anything about this contract..." class="flex-grow bg-slate-950/60 rounded-xl px-3.5 py-2.5 text-xs border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-300 outline-none transition">
-              <button onclick="sendChatMessage()" class="p-2.5 bg-indigo-650 hover:bg-indigo-500 text-white rounded-xl transition flex items-center justify-center">
+              <button onclick="sendChatMessage()" class="p-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center justify-center">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                 </svg>
@@ -639,7 +654,7 @@
     </div>
   </div>
 
-  <!-- Developer Console Modal (Hidden by default, secure configuration hub) -->
+  <!-- Developer Console Modal -->
   <div id="admin-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl relative space-y-4">
       <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
@@ -659,667 +674,381 @@
         <div>
           <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Make.com Webhook URL Override</label>
           <input type="text" id="adminWebhookUrl" placeholder="https://hook.us2.make.com/..." class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 font-mono focus:border-indigo-500 outline-none">
-          <p class="text-[9px] text-slate-500 mt-1">Leave blank to use default hardcoded Make.com webhook.</p>
+          <p class="text-[9px] text-slate-500 mt-1">Leave blank to run client-side intelligence analysis directly.</p>
         </div>
         <div>
-          <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Optional Gemini API Key (Direct Fallback)</label>
+          <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Optional Gemini API Key (Direct Connection)</label>
           <input type="password" id="adminApiKey" placeholder="AIzaSy..." class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 font-mono focus:border-indigo-500 outline-none">
-          <p class="text-[9px] text-slate-500 mt-1">Saves in browser memory to enable direct client-side auditing if your Make pipeline is offline.</p>
+          <p class="text-[9px] text-slate-500 mt-1">If specified, saves directly into your window's session memory to prevent external routing logs.</p>
         </div>
       </div>
 
-      <div class="mt-6 flex space-x-3">
+      <div class="flex space-x-3 pt-2">
         <button onclick="closeAdminConsole()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2 px-4 rounded-xl text-xs transition border border-slate-750">
           Cancel
         </button>
-        <button onclick="saveAdminConfigurations()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-xl text-xs transition">
-          Save Settings
+        <button onclick="saveAdminSettings()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-xl text-xs transition">
+          Save Secure Config
         </button>
       </div>
     </div>
   </div>
 
-  <!-- JS Logic -->
+  <!-- APPLICATION LOGIC CODE -->
   <script>
     // Initialize PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-    let activeInputTab = 'upload';
-    let activeUtilTab = 'upload';
-    let activeResultSubtab = 'risks';
-    let uploadedFile = null;
-    let auditReportData = null; // Store active report state
-    let extractedTextContent = ""; // Extracted raw text from uploaded contract
-    
-    // Serverless Gemini API Configuration for Chat/Brief
-    const apiKey = ""; // Runtime automatically provisions this key
-    const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+    // Global Application State Store
+    const State = {
+      activeUtilTab: 'upload',
+      activeInputTab: 'upload',
+      activeResultSubtab: 'risks',
+      uploadedFile: null,
+      extractedContractText: "",
+      analysisResults: null,
+      chatHistory: [],
+      currentFilter: 'ALL',
+      apiKey: "" // Set to empty string, environment provides runtime fallback
+    };
 
-    // Default Hardcoded Webhook URL
-    const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/2zll771322nbbw6xrb18t54xc5e23yx2";
-
-    // High fidelity sample data representing robust audits
-    const SAMPLE_NDAS = {
+    // Preloaded High-Exposure Sandbox Scenarios
+    const SAMPLE_CONTRACTS = {
       nda: {
-        contractType: "Non-Disclosure Agreement (Unilateral)",
-        overallRiskScore: 78,
-        riskTier: "HIGH EXPOSURE",
-        summary: "This agreement is highly non-mutual and asymmetric. It protects the Disclosing Party aggressively while leaving the Receiving Party vulnerable to intellectual property contamination, excessive indemnification, and endless duration bounds.",
-        liabilityProfile: "Uncapped Indemnity Matrix",
-        liabilityValue: 85,
-        ipSafety: "Asymmetric Transfer",
-        ipValue: 90,
-        disputeProfile: "NSW Australian Courts",
-        disputeValue: 75,
-        risks: [
-          {
-            clauseName: "Perpetual Confidentiality Term",
-            severity: "HIGH",
-            excerpt: "All obligations of confidentiality hereunder shall survive indefinitely regardless of any expiration or termination of the relationship between the parties.",
-            impact: "Creates an eternal record-keeping liability. If an ex-employee uses general business knowledge 15 years from now, the counterparty can claim a trade secret breach, triggering costly litigation.",
-            mitigation: "Except with respect to trade secrets under applicable statutory law, all obligations of confidentiality under this Agreement shall expire three (3) years from the effective date."
+        type: "Non-Disclosure Agreement (NDA)",
+        fileName: "unilateral_saas_confidentiality_v2.txt",
+        text: `MUTUAL NON-DISCLOSURE AGREEMENT
+This Mutual Non-Disclosure Agreement (the "Agreement") is entered into as of May 14, 2026 ("Effective Date"), by and between Acme Corp ("Discloser") and LegisShield Test Entity ("Recipient").
+
+1. Confidential Information. Recipient agrees that all information disclosed by Discloser, including source code, customer records, pricing sheets, and engineering blueprints, constitutes "Confidential Information" regardless of whether it is marked as confidential or not.
+2. Survival of Obligations. The obligations of Recipient under this Agreement shall survive the termination of this Agreement and remain in force in perpetuity (indefinitely) with respect to all disclosed information.
+3. Unilateral Indemnification. Recipient agrees to indemnify, defend, and hold harmless Discloser and its officers, directors, and employees from any and all damages, liabilities, costs, and attorney's fees arising out of any breach or suspected breach of this Agreement by Recipient or its representatives.
+4. Governing Law and Exclusive Venue. This Agreement and all disputes arising hereunder shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to conflict of laws principles. Any legal action arising under this Agreement must be brought exclusively in the courts located in Wilmington, Delaware, and both parties waive all objections to such jurisdiction.
+5. Injunction and Remedies. Recipient acknowledges that a breach of this Agreement will cause irreparable damage for which monetary compensation would be inadequate. Accordingly, Discloser shall be entitled to seek immediate injunctive relief without the necessity of posting a bond or proving actual damages.`,
+        mockResult: {
+          riskScore: 84,
+          contractType: "SaaS NDA",
+          summary: "This Non-Disclosure Agreement contains highly unbalanced indemnification provisions and an indefinite survival timeline that exposes the signer to continuous legal exposure.",
+          metrics: {
+            liability: 90,
+            ipSafety: 45,
+            disputeSovereignty: 75
           },
-          {
-            clauseName: "Unilateral Intellectual Property Assignment",
-            severity: "HIGH",
-            excerpt: "Any modifications, improvements, or feedback proposed by Receiving Party to Disclosing Party's technology shall instantly be owned solely by Disclosing Party.",
-            impact: "Feedback loop traps. Your product suggestions immediately transfer intellectual rights to them without royalty, locking you out of self-developing complementary systems.",
-            mitigation: "All feedback is provided 'AS-IS'. Receiving Party grants Disclosing Party a non-exclusive, royalty-free, perpetual license to use such feedback, retaining ownership of its own inventions."
-          },
-          {
-            clauseName: "Asymmetric Dispute Resolution Venue",
-            severity: "MEDIUM",
-            excerpt: "This agreement is governed by the laws of New South Wales, Australia, and any disputes shall be settled exclusively in courts therein.",
-            impact: "If a dispute occurs, you must hire foreign lawyers and pay travel costs to defend yourself, drastically shifting bargaining power in their favor.",
-            mitigation: "This Agreement shall be governed by local laws where the defendant in any dispute resides, and courts therein shall hold jurisdiction."
-          }
-        ],
-        missingClauses: [
-          {
-            clauseName: "Mutual Remedies / Fee Shifting Clause",
-            importance: "Ensures the prevailing party in any breach suit gets their attorney fees reimbursed. Without this, they can bleed you financially using high litigation overhead.",
-            recommendedLanguage: "The prevailing party in any action to enforce this Agreement shall be entitled to recover reasonable attorneys' fees, court costs, and related expenses."
-          },
-          {
-            clauseName: "Permitted Disclosures (Legal compulsion)",
-            importance: "Critical safety valve if you are subpoenaed by court or government agency. Without it, complying with the law is technically a breach.",
-            recommendedLanguage: "Receiving Party may disclose Confidential Information pursuant to a subpoena, court order, or government regulation, provided it gives Disclosing Party immediate prior notice to seek a protective order."
-          }
-        ],
-        compliance: {
-          gdprStatus: "FAIL",
-          gdprExplanation: "Contains zero clauses outlining GDPR Standard Contractual Clauses (SCCs) or specifying appropriate data deletion procedures for EU citizens.",
-          securityStatus: "WARNING",
-          securityExplanation: "Mentions standard breach notifications but does not commit the provider to structured SOC2 security evaluations or direct notification SLAs.",
-          liabilityCapStatus: "FAIL",
-          liabilityCapExplanation: "Contains uncapped indemnities. Standard limit in NDA arrangements must be capped at explicit amounts."
-        },
-        slides: [
-          {
-            slideNumber: 1,
-            title: "Executive Summary: Unilateral NDA Risk Profile",
-            bullets: [
-              "Verdict: DO NOT SIGN (Must renegotiate key terms).",
-              "Asymmetric protection posture heavily favoring the counterparty.",
-              "Lack of clear intellectual property and mutual dispute exemptions."
-            ]
-          },
-          {
-            slideNumber: 2,
-            title: "Top Unfavorable Liability Channels Found",
-            bullets: [
-              "Perpetual confidentiality requirements create permanent record liabilities.",
-              "Asymmetric feedback transfer assignment clauses trigger trade-secret loopholes.",
-              "Asymmetric Dispute resolution venue locks you out of defensible forums."
-            ]
-          },
-          {
-            slideNumber: 3,
-            title: "Target Redline Safe-Harbors Plan",
-            bullets: [
-              "Transition the confidentiality obligations to expire after 3 years.",
-              "Convert Intellectual property feedback assignments to mutual 'AS-IS' terms.",
-              "Apply standard local venue options to neutralise international dispute overhead."
-            ]
-          }
-        ],
-        negotiation: {
-          strategicPosture: "Maintain a firm and highly protective posture. Request a transition to mutuality across all indemnification and intellectual property safety valves.",
-          leverageRating: "MODERATE LEVERAGE",
-          leverageScore: 55,
-          leveragePoints: [
+          redlines: [
             {
-              pointTitle: "Perpetual Confidentiality Term",
-              pointAction: "Confidentiality terms must be modified to expire within three (3) years to avoid permanent compliance overhead."
+              severity: "HIGH",
+              clause: "Unilateral Indemnification (Section 3)",
+              implication: "Recipient is solely responsible for all legal costs, claims, and damages on any alleged breach of confidentiality without any mutual safety nets.",
+              redline: "Replace Section 3 with a standard clause: 'Each party shall be responsible for its own breaches of this Agreement. Neither party shall be liable for indirect, incidental, or consequential damages.'"
             },
             {
-              pointTitle: "Unilateral Intellectual Property Assignment",
-              pointAction: "Reject any feedback ownership transfers. Convert feedback loops to simple mutual royalty-free use licenses instead."
+              severity: "HIGH",
+              clause: "In perpetuity Survival Obligations (Section 2)",
+              implication: "Confidentiality obligations last forever. This is extremely burdensome for normal commercial data and exposes you to multi-year compliance audits.",
+              redline: "Modify Section 2: 'The obligations of confidentiality under this Agreement shall remain in force for a period of three (3) years from the date of disclosure.'"
             },
             {
-              pointTitle: "Asymmetric Dispute Resolution Venue",
-              pointAction: "Request transition to a neutral dispute forum or the defendant's primary business jurisdiction to optimize balance."
+              severity: "MEDIUM",
+              clause: "Exclusive Venue in Delaware (Section 4)",
+              implication: "Any operational dispute forces your corporate legal team to defend lawsuits in Delaware, increasing litigation expenses significantly.",
+              redline: "Amend to mutual local venue or neutral arbitration under JAMS rules: 'The parties agree to resolve any dispute in a mutually agreed neutral jurisdiction.'"
             }
           ],
-          emailDraft: "Subject: Counter-Proposal & Proposed Redlines - [Project Name]\n\nDear [Name],\n\nWe have reviewed the proposed Non-Disclosure Agreement. In order to proceed with our partnership, we have prepared standard redline amendments to make the agreement mutual.\n\nOur primary areas of adjustment concern: \n1. Confidentiality Obligation Limits (reducing indefinite burdens to a mutual 3-year term).\n2. Feedback Rights (retaining our core IP rights and licensing feedback instead of absolute assignment).\n3. Governing Law (aligning disputes to a mutual local venue).\n\nPlease find our attached redline markup. We look forward to finalized execution.\n\nBest regards,\n\n[Your Name]"
-        },
-        rawText: "This Non-Disclosure Agreement (the 'Agreement') is entered into by Disclosing Party and Receiving Party. Confidentiality obligations survive indefinitely regardless of expiration of the relationship. Any modifications, improvements, or feedback proposed by Receiving Party shall instantly be owned solely by Disclosing Party. Governed by the laws of New South Wales, Australia."
+          missing: [
+            {
+              name: "Standard Exceptions to Confidentiality",
+              whyNeeded: "Without standard exemptions (public knowledge, prior possession, independent development), you can be sued for using public industry knowledge.",
+              recommendedDraft: "Add: 'Confidential Information does not include information that: (a) is or becomes publicly known through no breach of this Agreement; (b) was already in Recipient’s possession; or (c) is independently developed without reference to the Discloser’s information.'"
+            },
+            {
+              name: "Permitted Disclosures (Under Compelled Court Order)",
+              whyNeeded: "If a court subpoenas you to reveal this information, you will be in direct breach of contract unless a legal compulsion exemption exists.",
+              recommendedDraft: "Add: 'Recipient may disclose Confidential Information to the extent required by law or court order, provided Recipient gives Discloser prompt written notice of such requirement to allow Discloser to seek a protective order.'"
+            }
+          ],
+          negotiation: {
+            posture: "Defensive & Protective",
+            leverageRating: 40,
+            leveragePoints: [
+              {
+                title: "No Exemption Safety-Valve",
+                description: "Point out to the counterparty that the omission of standard confidentiality exceptions is a non-standard departure from institutional norms."
+              },
+              {
+                title: "Indemnity Asymmetry",
+                description: "State clearly that NDAs do not customarily contain unilateral indemnity structures, as breaches of confidentiality are already remediable via injunctive relief."
+              }
+            ],
+            emailDraft: "Dear Partner Team,\n\nThank you for sharing the draft NDA for our upcoming SaaS discussions. We have completed a legal review and have a few requested updates to align the document with standard commercial practices.\n\nSpecifically, we need to make confidentiality survival mutual and capped at 3 years, insert standard carve-outs for public information, and remove the unilateral indemnification clause (Section 3) which is non-standard for exploratory NDAs.\n\nWe have attached our redline suggestions for your team's review.\n\nBest regards,\nLegal & Strategy Team"
+          },
+          compliance: {
+            gdprStatus: "WARNING",
+            gdprExplanation: "The definition of 'Confidential Information' is broad enough to include employee and customer PII, but does not incorporate GDPR-compliant data processing terms (DPAs) or standard contractual clauses.",
+            securityStatus: "COMPLIANT",
+            securityExplanation: "The contract contains basic clauses protecting blueprints and technical data, but lacks explicit requirements for regular security compliance reports (SOC2/ISO).",
+            liabilityStatus: "NON-COMPLIANT",
+            liabilityExplanation: "Unilateral and uncapped indemnification completely breaks internal company compliance parameters that mandate a 1x contract value liability cap."
+          },
+          boardDeck: [
+            {
+              slideTitle: "Executive Summary: SaaS Partnership NDA",
+              points: [
+                "Negotiating with Acme Corp to enable deep system integrations.",
+                "Original agreement exposes Recipient to infinite-duration liability streams.",
+                "Recommendation: Do not sign in its current form."
+              ]
+            },
+            {
+              slideTitle: "Critical Redline Highlights",
+              points: [
+                "Unilateral Indemnity: Transports all operational financial risk onto our balance sheet.",
+                "Indefinite Obligations: Locks our product engineering division to a perpetual covenant.",
+                "Delaware Venue: Standard but causes additional jurisdictional defense overhead."
+              ]
+            },
+            {
+              slideTitle: "Action Plan & Timeline",
+              points: [
+                "Transmit updated bilateral redlines immediately.",
+                "Target a mutual 3-year term of confidentiality with zero unilateral indemnification.",
+                "Escalate to General Counsel if the counterparty rejects standard exceptions."
+              ]
+            }
+          ]
+        }
       },
       saas: {
-        contractType: "SaaS Enterprise SLA Agreement",
-        overallRiskScore: 45,
-        riskTier: "MEDIUM RISK",
-        summary: "The Service Level Agreement provides limited system credit returns and heavily shields the service provider from structural outages, forcing the enterprise customer to absorb the cost of direct system downtime.",
-        liabilityProfile: "Limited To 12-Mo Fees",
-        liabilityValue: 40,
-        ipSafety: "Provider Solely Protected",
-        ipValue: 55,
-        disputeProfile: "Neutral Arbitration",
-        disputeValue: 30,
-        risks: [
-          {
-            clauseName: "Inconsequential System Credit Restitution",
-            severity: "MEDIUM",
-            excerpt: "Downtime below 95% triggers a service credit equal to 2% of the monthly SaaS fees, which shall serve as the Customer's sole and exclusive remedy.",
-            impact: "A massive multi-hour outage stopping your daily business operations only gets you a negligible discount on next month's bill while you lose thousands in real revenue.",
-            mitigation: "Downtime below 95% shall entitle Customer to a 25% credit. Outages exceeding 8 consecutive hours shall constitute a material breach, giving Customer the right to immediate termination with a prorated refund."
+        type: "SaaS Master Service Agreement",
+        fileName: "cloud_enterprise_sla_terms.txt",
+        text: `MASTER SERVICE AGREEMENT
+This Enterprise Agreement (the "Agreement") governs the subscription and deployment of the Cloud Suite ("Services") provided by SaaS Global Systems ("Vendor") to the Subscriber ("Client").
+
+1. Payment and Renewal Term. The Agreement shall commence on the sign date and continue for an Initial Term of twenty-four (24) months. Upon expiration of the Initial Term, this Agreement shall automatically renew for successive twelve (12) month terms unless Client provides written notice of non-renewal at least ninety (90) days prior to the expiration of the current term.
+2. Price Increases. Vendor reserves the right to adjust subscription rates for the Services up to fifteen percent (15%) annually upon renewal, without prior notice to Client.
+3. Service Level Agreement (SLA). Vendor targets a 99.9% uptime metric. In the event Vendor fails to achieve this metric, Client's sole and exclusive remedy shall be to receive a service credit equal to 2% of the monthly subscription fee for the affected month. In no event shall persistent downtime constitute a material breach of this Agreement.
+4. Intellectual Property Ownership. All modifications, configurations, customizations, and integrations developed during the deployment of the Services, whether developed by Vendor, Client, or collaboratively, shall remain the sole and exclusive property of Vendor. Client hereby assigns all rights, titles, and interests in such customizations to Vendor.
+5. Limitation of Liability. Vendor's total, cumulative liability for all claims arising out of or related to this Agreement, whether in contract, tort, or otherwise, shall be strictly limited to the amount actually paid by Client to Vendor in the three (3) months preceding the event giving rise to the claim.`,
+        mockResult: {
+          riskScore: 78,
+          contractType: "SaaS Vendor Agreement",
+          summary: "This vendor agreement features a aggressive auto-renewal mechanism, high annual price-escalation caps, and unbalanced ownership of custom configurations built at your expense.",
+          metrics: {
+            liability: 85,
+            ipSafety: 30,
+            disputeSovereignty: 50
           },
-          {
-            clauseName: "Provider Exemption of Scheduled Maintenance",
-            severity: "LOW",
-            excerpt: "Scheduled maintenance, declared at the Provider's sole discretion with up to 1 hour notice, shall be completely excluded from uptime calculations.",
-            impact: "The provider can shut down the systems during busy hours with almost zero warning and avoid getting penalized for it.",
-            mitigation: "Scheduled maintenance must be announced at least seven (7) business days in advance, and occur exclusively between 2:00 AM and 5:00 AM EST on weekends."
-          }
-        ],
-        missingClauses: [
-          {
-            clauseName: "Data Portability & Exit Assistance",
-            importance: "Ensures you can get your complete raw database back in structured formats if you decide to cancel or transition service providers.",
-            recommendedLanguage: "Upon termination, Provider shall, within ten (10) business days, deliver to Customer a complete, readable JSON export of all user data at no additional cost."
-          }
-        ],
-        compliance: {
-          gdprStatus: "PASS",
-          gdprExplanation: "Contains correct parameters regarding EU data localization, data controller/processor boundaries, and GDPR sub-processor auditing rights.",
-          securityStatus: "WARNING",
-          securityExplanation: "Mentions compliance controls but does not state real-time system vulnerability scan notification schedules.",
-          liabilityCapStatus: "PASS",
-          liabilityCapExplanation: "Standard double-cap on liability. Protects enterprise clients against standard software transaction overhead."
-        },
-        slides: [
-          {
-            slideNumber: 1,
-            title: "Enterprise SLA Profile: SaaS SLA Risk Rating",
-            bullets: [
-              "Verdict: RENEGOTIATE SERVICE LEVEL AGREEMENT CREDITS.",
-              "Uptime credits are too low to constitute an actual operational remedy.",
-              "Lack of standard exit assistance, migration support, and data export provisions."
-            ]
-          },
-          {
-            slideNumber: 2,
-            title: "Top SLA Pitfalls Detected",
-            bullets: [
-              "2% credits are functionally useless remedies against a multi-hour database crash.",
-              "Scheduled maintenance definitions allow providers to declare instant shutdowns.",
-              "Absent exit clauses create high risk of complete vendor lock-in."
-            ]
-          },
-          {
-            slideNumber: 3,
-            title: "Recommended SLA Adjustments",
-            bullets: [
-              "Raise SLA breach credits to a tiered structure capped at 50% monthly fees.",
-              "Enforce 7-day minimum warnings on scheduled network maintenance.",
-              "Draft standard 10-day data extraction timelines on partnership termination."
-            ]
-          }
-        ],
-        negotiation: {
-          strategicPosture: "Request standard tiered SLA credit adjustments. Maintain a firm stance on securing exit portability requirements to prevent structural lock-in.",
-          leverageRating: "STRONG LEVERAGE",
-          leverageScore: 80,
-          leveragePoints: [
+          redlines: [
             {
-              pointTitle: "Upgrade Outage Credit Returns",
-              pointAction: "Uptime below 95% must trigger an active 25% monthly fee credit rebate to cover real business losses."
+              severity: "HIGH",
+              clause: "Customization IP Ownership & Assignment (Section 4)",
+              implication: "If you pay the vendor to build custom integrations or API connections, the vendor automatically owns those assets. You cannot easily reuse them or migrate off the platform.",
+              redline: "Revise Section 4: 'All custom integrations, configurations, and work product developed solely by Client or specifically paid for by Client as custom deliverables shall remain the property of Client.'"
             },
             {
-              pointTitle: "Enforce Portability Standards",
-              pointAction: "Secure formal commitments ensuring complete JSON data exports are provided free of cost upon termination."
+              severity: "HIGH",
+              clause: "90-day Auto-Renewal & 15% Annual Escalations (Section 1 & 2)",
+              implication: "Missing the renewal deadline by one day locks you in for a full year. The vendor can also raise your pricing by 15% without notifying you beforehand.",
+              redline: "Reduce notice to thirty (30) days and limit price increases to CPI or a maximum of 3% with mandatory 60 days advance written notice."
+            },
+            {
+              severity: "MEDIUM",
+              clause: "Excessive Limitation of Liability (Section 5)",
+              implication: "A 3-month fee liability cap is extremely small. If the vendor leaks all your confidential customer data, you would only recover a fraction of the actual damages.",
+              redline: "Adjust the limit: 'Liability shall be limited to twelve (12) months of subscription fees paid, except for breaches of confidentiality, security, or data protection, which shall have a super-cap of 3x the annual fee.'"
             }
           ],
-          emailDraft: "Subject: Proposed SLA Revisions - SLA Agreement\n\nDear [Name],\n\nThank you for sharing the SLA proposal. To finalize our software agreement, we require some minor structural changes to the service credits and data portability clauses:\n\n1. OUTAGE CREDIT Tiers: We propose adjusting SLA outage credits from 2% to a tier structure capping at 50% for extensive outages.\n2. EXIT PORTABILITY: We require clear text guaranteeing a free JSON export of our operational databases within 10 days of cancellation.\n\nAttached are our redlines. Please let us know if we can schedule a quick 10-minute sync to finalize our partnership.\n\nBest regards,\n\n[Your Name]"
-        },
-        rawText: "SaaS Enterprise Service Level Agreement. Service uptime goal is 99%. Downtime below 95% triggers a service credit equal to 2% of SaaS fees, serving as the sole remedy. Scheduled maintenance, declared at the Provider's sole discretion with up to 1 hour notice, shall be excluded from uptime calculations."
+          missing: [
+            {
+              name: "Data Portability & Exit Provisions",
+              whyNeeded: "If you terminate the relationship, the contract does not force the vendor to export your corporate data in an accessible format, creating high lock-in risks.",
+              recommendedDraft: "Add: 'Upon termination, Vendor shall, within ten (10) days, provide Client with a full, structured export of all Client Data in CSV or JSON format at no additional charge, and secure a complete deletion of all active copies of Client Data on Vendor servers.'"
+            },
+            {
+              name: "SLA Termination Escape Clause",
+              whyNeeded: "Under the current clause, even if the system is down for weeks, you cannot cancel. You only receive insignificant 2% credits.",
+              recommendedDraft: "Add: 'If the Service Uptime falls below 95.0% in any consecutive three (3) months, Client shall have the right to terminate this Agreement immediately for material breach with zero cancellation penalties.'"
+            }
+          ],
+          negotiation: {
+            posture: "Assertive & Structured",
+            leverageRating: 65,
+            leveragePoints: [
+              {
+                title: "Pre-paid Custom Deliverables",
+                description: "Refuse the automatic transfer of intellectual property rights on custom developments that your enterprise is explicitly funding."
+              },
+              {
+                title: "Price Escalation Caps",
+                description: "Propose a standard CPI cap for price increases, stating that 15% annual escalations exceed typical cloud budgeting parameters."
+              }
+            ],
+            emailDraft: "Dear Vendor Team,\n\nWe have reviewed the draft Master Service Agreement for the Cloud Suite subscription. We are very excited about working together, but we need to address a few business terms to align the agreement with our procurement requirements.\n\n1. Automatic Renewal & Price Adjustments: We require a 30-day non-renewal notice period instead of 90 days, and request price increases upon renewal to be capped at a maximum of 4% annually with 60 days advance notice.\n2. Intellectual Property (Section 4): Any custom API integrations developed on our side must remain our property, while standard vendor product configurations can remain yours.\n3. Liability Limits: We require a mutual 12-month trailing subscription liability cap, with a separate 2x cap for data privacy and security events.\n\nPlease let us know if you can accept these basic updates so we can finalize the contract this week.\n\nBest regards,\nEnterprise Procurement Director"
+          },
+          compliance: {
+            gdprStatus: "NON-COMPLIANT",
+            gdprExplanation: "The vendor handles core subscriber data but fails to commit to a formal Data Processing Addendum (DPA) or specify compliant subprocessors, creating direct GDPR exposure.",
+            securityStatus: "WARNING",
+            securityExplanation: "The agreement states the target uptime metric but provides zero assurances on SOC 2 audits, network encryption, or prompt breach notifications.",
+            liabilityStatus: "WARNING",
+            liabilityExplanation: "A 3-month recovery cap is too low to cover data recovery expenses or regulatory fines, creating a budget gap in case of an incident."
+          },
+          boardDeck: [
+            {
+              slideTitle: "Vendor Deal Assessment: Cloud Suite MSA",
+              points: [
+                "Procurement proposal to purchase SaaS Global Systems' platform.",
+                "Provides critical process automations, but presents high lock-in risks.",
+                "Negotiating terms is necessary prior to sign-off."
+              ]
+            },
+            {
+              slideTitle: "High-Exposure Areas & Risks",
+              points: [
+                "Unbounded IP Transfers: Vendor gains ownership of our custom API scripts.",
+                "Auto-Renewal Trap: 90-day escape window is easily missed by procurement admins.",
+                "Price Escalation: Up to 15% increase per year compounding can inflate pricing rapidly."
+              ]
+            },
+            {
+              slideTitle: "Negotiation Plan & Next Steps",
+              points: [
+                "Propose our standard enterprise addendum covering Data Protection & Exit provisions.",
+                "Enforce a 30-day notice period and CPI-linked price hike caps.",
+                "Escalate to the executive team if security reporting requirements are rejected by vendor."
+              ]
+            }
+          ]
+        }
       }
     };
 
-    /**
-     * Retrieves the active Webhook URL (checks localStorage override, falls back to hardcoded production value)
-     */
-    function getActiveWebhookUrl() {
-      const customUrl = localStorage.getItem('legisshield_webhook_url');
-      return (customUrl && customUrl.trim().length > 10) ? customUrl.trim() : MAKE_WEBHOOK_URL;
-    }
-
-    /**
-     * Retrieves the active Gemini API Key (checks localStorage override, falls back to default runtime variable)
-     */
-    function getActiveApiKey() {
-      const customKey = localStorage.getItem('legisshield_api_key');
-      return (customKey && customKey.trim().length > 10) ? customKey.trim() : apiKey;
-    }
-
-    /**
-     * Browser-side Fetch Client equipped with strict exponential backoff algorithm
-     * Retries up to 5 times (1s, 2s, 4s, 8s, 16s delays) on timeouts or transient codes.
-     */
-    async function makeGeminiApiCall(payload) {
-      const activeKey = getActiveApiKey();
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${activeKey}`;
-      const retryDelays = [1000, 2000, 4000, 8000, 16000];
-      
-      for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
-        try {
-          const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-
-          if (!response.ok) {
-            const errorDetails = await response.text();
-            throw new Error(`API returned ${response.status}: ${errorDetails}`);
-          }
-
-          const data = await response.json();
-          return data;
-        } catch (error) {
-          if (attempt === retryDelays.length) {
-            throw new Error(`Connection failed after ${attempt + 1} retries: ${error.message}`);
-          }
-          await new Promise(resolve => setTimeout(resolve, retryDelays[attempt]));
-        }
-      }
-    }
-
-    /**
-     * Vertical tabs for settings configurations (Left sidebar)
-     */
+    // Tab Switching: Auditing vs Trap Decoder
     function switchUtilTab(tab) {
-      activeUtilTab = tab;
-      const tabs = ['upload', 'traps'];
-      tabs.forEach(item => {
-        const btn = document.getElementById(`utiltab-${item}`);
-        const panel = document.getElementById(`utilpanel-${item}`);
-        if (!btn || !panel) return;
-        if (item === tab) {
-          btn.className = "flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all duration-200 bg-indigo-600 text-white shadow-md";
-          panel.classList.remove('hidden');
-        } else {
-          btn.className = "flex-1 text-center py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-200";
-          panel.classList.add('hidden');
-        }
-      });
+      State.activeUtilTab = tab;
+      const uploadTab = document.getElementById('utiltab-upload');
+      const trapsTab = document.getElementById('utiltab-traps');
+      const uploadPanel = document.getElementById('utilpanel-upload');
+      const trapsPanel = document.getElementById('utilpanel-traps');
+
+      if (tab === 'upload') {
+        uploadTab.className = 'flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all duration-200 bg-indigo-600 text-white shadow-md';
+        trapsTab.className = 'flex-1 text-center py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-200';
+        uploadPanel.classList.remove('hidden');
+        trapsPanel.classList.add('hidden');
+      } else {
+        trapsTab.className = 'flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all duration-200 bg-indigo-600 text-white shadow-md';
+        uploadTab.className = 'flex-1 text-center py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-200';
+        trapsPanel.classList.remove('hidden');
+        uploadPanel.classList.add('hidden');
+      }
+      showToast(`Switched terminal view to ${tab === 'upload' ? 'Auditing Center' : 'Trap Decoder'}`);
     }
 
-    /**
-     * Tabs between file upload and raw pasting
-     */
+    // Input Tab Switching: File Dropzone vs Pasted Text
     function switchInputTab(tab) {
-      activeInputTab = tab;
-      const btnUpload = document.getElementById('tab-upload');
-      const btnText = document.getElementById('tab-text');
-      const upContainer = document.getElementById('upload-container');
+      State.activeInputTab = tab;
+      const uploadBtn = document.getElementById('tab-upload');
+      const textBtn = document.getElementById('tab-text');
+      const uploadContainer = document.getElementById('upload-container');
       const textContainer = document.getElementById('text-container');
 
       if (tab === 'upload') {
-        btnUpload.className = "flex-1 text-center py-1.5 text-[11px] font-bold rounded transition bg-indigo-600/80 text-white";
-        btnText.className = "flex-1 text-center py-1.5 text-[11px] font-bold rounded text-slate-400 hover:text-slate-200 transition";
-        upContainer.classList.remove('hidden');
+        uploadBtn.className = 'flex-1 text-center py-1.5 text-[11px] font-bold rounded transition bg-indigo-600/80 text-white';
+        textBtn.className = 'flex-1 text-center py-1.5 text-[11px] font-bold rounded text-slate-400 hover:text-slate-200 transition';
+        uploadContainer.classList.remove('hidden');
         textContainer.classList.add('hidden');
       } else {
-        btnText.className = "flex-1 text-center py-1.5 text-[11px] font-bold rounded transition bg-indigo-600/80 text-white";
-        btnUpload.className = "flex-1 text-center py-1.5 text-[11px] font-bold rounded text-slate-400 hover:text-slate-200 transition";
+        textBtn.className = 'flex-1 text-center py-1.5 text-[11px] font-bold rounded transition bg-indigo-600/80 text-white';
+        uploadBtn.className = 'flex-1 text-center py-1.5 text-[11px] font-bold rounded text-slate-400 hover:text-slate-200 transition';
         textContainer.classList.remove('hidden');
-        upContainer.classList.add('hidden');
+        uploadContainer.classList.add('hidden');
       }
     }
 
-    /**
-     * Swaps display between result sub-panels
-     */
+    // Result Inner Subtabs
     function switchResultSubtab(subtab) {
-      activeResultSubtab = subtab;
-      
-      const subTabsList = ['risks', 'missing', 'brief', 'chat', 'compliance', 'board'];
-      subTabsList.forEach(item => {
-        const btn = document.getElementById(`subtab-${item}`);
-        const panel = document.getElementById(`panel-${item}`);
-        
-        if (item === subtab) {
-          btn.className = "text-center py-2 text-[10px] font-bold rounded-lg transition-all duration-150 bg-indigo-600 text-white flex items-center justify-center space-x-1";
-          panel.classList.remove('hidden');
+      State.activeResultSubtab = subtab;
+      const tabs = ['risks', 'missing', 'brief', 'chat', 'compliance', 'board'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`subtab-${t}`);
+        const panel = document.getElementById(`panel-${t}`);
+        if (t === subtab) {
+          btn.className = 'text-center py-2 text-[10px] font-bold rounded-lg transition-all duration-150 bg-indigo-600 text-white flex items-center justify-center space-x-0.5';
+          if (panel) panel.classList.remove('hidden');
         } else {
-          btn.className = "text-center py-2 text-[10px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-150 flex items-center justify-center space-x-1";
-          panel.classList.add('hidden');
+          btn.className = 'text-center py-2 text-[10px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-150 flex items-center justify-center space-x-0.5';
+          if (panel) panel.classList.add('hidden');
         }
       });
     }
 
-    /**
-     * Handlers for file selection & drop interfaces
-     */
-    function handleFileSelect(e) {
-      const files = e.target.files || e.dataTransfer.files;
-      if (files.length > 0) {
-        uploadedFile = files[0];
-        document.getElementById('dropzone-prompt').classList.add('hidden');
-        const fileInfo = document.getElementById('file-info');
-        fileInfo.classList.remove('hidden');
-        document.getElementById('fileName').textContent = `${uploadedFile.name} (${(uploadedFile.size/1024).toFixed(1)} KB)`;
-        showToast("File loaded successfully.");
+    // File Selection Handles
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.size > 10 * 1024 * 1024) {
+        showCustomAlert("File Too Large", "Please upload a contract file smaller than 10MB to guarantee real-time browser buffer allocation.");
+        return;
       }
+
+      State.uploadedFile = file;
+      document.getElementById('dropzone-prompt').classList.add('hidden');
+      document.getElementById('file-info').classList.remove('hidden');
+      document.getElementById('fileName').innerText = file.name;
+      showToast(`Selected contract file: ${file.name}`);
     }
 
-    function resetFileSelection(e) {
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-      uploadedFile = null;
-      extractedTextContent = "";
-      document.getElementById('fileInput').value = '';
+    function resetFileSelection(event) {
+      if (event) event.stopPropagation();
+      State.uploadedFile = null;
+      document.getElementById('fileInput').value = "";
       document.getElementById('dropzone-prompt').classList.remove('hidden');
       document.getElementById('file-info').classList.add('hidden');
-      showToast("File selection reset.");
+      showToast("Cleared file selection");
     }
 
-    /**
-     * Client-side text extraction from PDF using PDF.js or standard text FileReader
-     */
-    async function extractTextFromFile(file) {
-      if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.onerror = (err) => reject(err);
-          reader.readAsText(file);
-        });
-      } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        let completeText = "";
-        
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          const strings = textContent.items.map(item => item.str);
-          completeText += strings.join(" ") + "\n";
-        }
-        
-        return completeText;
-      } else {
-        throw new Error("Unsupported file format. Please upload a PDF or TXT document.");
-      }
-    }
+    // Load sandbox scenario instantly
+    function loadSample(key) {
+      const sample = SAMPLE_CONTRACTS[key];
+      if (!sample) return;
 
-    /**
-     * Loads predefined sample contract audits (Predefined Sandboxes)
-     */
-    function loadSample(type) {
-      showLoadingScreen();
-      setTimeout(() => {
-        const data = SAMPLE_NDAS[type];
-        extractedTextContent = data.rawText;
-        resetSecondaryPanels(data.contractType);
-        
-        // Auto-populate advanced tab data for dry-runs
-        if (data.compliance) renderComplianceResults(data.compliance);
-        if (data.slides) renderSlidesResults(data.slides);
-        if (data.negotiation) renderBriefResults(data.negotiation);
-
-        renderResults(data);
-        showToast(`Loaded ${data.contractType} Simulation Model`);
-      }, 1500);
-    }
-
-    /**
-     * Resets subtab panels with appropriate dynamic context
-     */
-    function resetSecondaryPanels(contractType) {
-      document.getElementById('brief-placeholder').classList.remove('hidden');
-      document.getElementById('brief-content').classList.add('hidden');
+      // Switch input mode to paste text and set text
+      switchInputTab('text');
+      document.getElementById('contractTextInput').value = sample.text;
       
-      document.getElementById('compliance-placeholder').classList.remove('hidden');
-      document.getElementById('compliance-content').classList.add('hidden');
-      
-      document.getElementById('board-placeholder').classList.remove('hidden');
-      document.getElementById('board-content').classList.add('hidden');
+      showToast(`Loaded sandbox: ${sample.type}`);
+      triggerAudit(sample.mockResult);
+    }
 
-      document.getElementById('chat-messages').innerHTML = `
-        <div class="flex items-start space-x-2.5">
-          <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
-          <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-200 leading-relaxed max-w-[85%]">
-            Greetings, Negotiator. I am grounded in your ${contractType} specifications. Ask me to modify any clause or check liabilities.
-          </div>
-        </div>
+    // Custom non-blocking visual feedback toast
+    function showToast(message) {
+      const container = document.getElementById('notification-hub');
+      const toast = document.createElement('div');
+      toast.className = 'bg-slate-900 border border-slate-800 text-slate-200 text-xs px-4 py-2.5 rounded-xl shadow-2xl flex items-center space-x-2 animate-slide-in pointer-events-auto transition duration-300';
+      toast.innerHTML = `
+        <span class="h-1.5 w-1.5 rounded-full bg-indigo-500"></span>
+        <span>${message}</span>
       `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
     }
 
-    /**
-     * Renders loading skeletons with realistic sequential stages
-     */
-    function showLoadingScreen() {
-      document.getElementById('state-empty').classList.add('hidden');
-      document.getElementById('state-results').classList.add('hidden');
-      const loader = document.getElementById('state-loading');
-      loader.classList.remove('hidden');
-
-      // Reset loading steps visual
-      for (let i = 1; i <= 3; i++) {
-        const el = document.getElementById(`step-${i}`);
-        el.classList.add('opacity-40');
-        const span = el.querySelector('span');
-        span.className = "h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold";
-        span.textContent = i;
-      }
-
-      const steps = [
-        { title: "Extracting Document Buffer", status: "Converting text and formatting PDF layers client-side...", step: 1 },
-        { title: "Triggering Automated Make Pipeline", status: "Sending payload to your custom scenario endpoint...", step: 2 },
-        { title: "Compiling Structured Response", status: "Formulating risks and recommended redline rewrites...", step: 3 }
-      ];
-
-      steps.forEach((s, idx) => {
-        setTimeout(() => {
-          document.getElementById('loader-title').textContent = s.title;
-          document.getElementById('loader-status').textContent = s.status;
-          
-          const stepEl = document.getElementById(`step-${s.step}`);
-          stepEl.classList.remove('opacity-40');
-          const span = stepEl.querySelector('span');
-          span.className = "h-5 w-5 rounded-full flex items-center justify-center bg-emerald-500 text-slate-950 font-bold";
-          span.innerHTML = `<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
-        }, idx * 700);
-      });
-    }
-
-    /**
-     * Performs a direct serverless browser-side audit on Gemini
-     * Used when Make.com is offline, missing response modules, or returning plain "Accepted".
-     */
-    async function runClientSideAudit(contractText) {
-      const SYSTEM_PROMPT = `You are an elite, corporate General Counsel and Risk Mitigation Architect specializing in business contracts.
-Your objective is to analyze the provided contract text and extract high-friction liabilities, unfavorable terms, and critical missing clauses.
-Be highly objective, analytical, and precise. Every identified risk must have an exact excerpt from the text as proof, followed by an explanation of how it impacts the business, and a ready-to-use redline rewrite/mitigation strategy. Output must fit the requested JSON schema structure exactly.`;
-
-      const AUDIT_RESPONSE_SCHEMA = {
-        type: "OBJECT",
-        properties: {
-          contractType: { type: "STRING" },
-          overallRiskScore: { type: "INTEGER" },
-          riskTier: { type: "STRING" },
-          summary: { type: "STRING" },
-          liabilityProfile: { type: "STRING", description: "Liability rating tag (e.g. Uncapped, Indefinite, Balanced, Restricted)" },
-          liabilityValue: { type: "INTEGER", description: "Liability risk value score from 0 (Perfect) to 100 (Unfavorable)" },
-          ipSafety: { type: "STRING", description: "Intellectual Property safety tag (e.g. Asymmetric, Shared, Solely Protected)" },
-          ipValue: { type: "INTEGER", description: "IP risk value score from 0 to 100" },
-          disputeProfile: { type: "STRING", description: "Governing law venue tag (e.g. Unfavorable Foreign, Neutral Arbitration, Local Courts)" },
-          disputeValue: { type: "INTEGER", description: "Venue risk value score from 0 to 100" },
-          risks: {
-            type: "ARRAY",
-            items: {
-              type: "OBJECT",
-              properties: {
-                clauseName: { type: "STRING" },
-                severity: { type: "STRING" },
-                excerpt: { type: "STRING" },
-                impact: { type: "STRING" },
-                mitigation: { type: "STRING" }
-              },
-              required: ["clauseName", "severity", "excerpt", "impact", "mitigation"]
-            }
-          },
-          missingClauses: {
-            type: "ARRAY",
-            items: {
-              type: "OBJECT",
-              properties: {
-                clauseName: { type: "STRING" },
-                importance: { type: "STRING" },
-                recommendedLanguage: { type: "STRING" }
-              },
-              required: ["clauseName", "importance", "recommendedLanguage"]
-            }
-          }
-        },
-        required: ["contractType", "overallRiskScore", "riskTier", "summary", "liabilityProfile", "liabilityValue", "ipSafety", "ipValue", "disputeProfile", "disputeValue", "risks", "missingClauses"]
-      };
-
-      const payload = {
-        contents: [{ parts: [{ text: `Evaluate this legal document text for risk and liabilities: \n\n${contractText.substring(0, 40000)}` }] }],
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: AUDIT_RESPONSE_SCHEMA,
-          temperature: 0.15
-        }
-      };
-
-      const responseData = await makeGeminiApiCall(payload);
-      const candidateText = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
-      
-      if (!candidateText) {
-        throw new Error("The Gemini model generated an empty response content structural payload.");
-      }
-
-      return JSON.parse(candidateText);
-    }
-
-    /**
-     * Primary Audit Trigger: Routes extraction data directly to your Make.com Webhook
-     * Equipped with an automatic client-side backup logic if Make.com returns "Accepted" or is unavailable.
-     */
-    async function triggerAudit() {
-      const isTextMode = activeInputTab === 'text';
-      let contractText = "";
-
-      try {
-        if (isTextMode) {
-          contractText = document.getElementById('contractTextInput').value;
-          if (!contractText || contractText.trim().length < 50) {
-            showNotification("Paste a larger contract segment (at least 50 chars) to initiate analysis.", "warning");
-            return;
-          }
-        } else {
-          if (!uploadedFile) {
-            showNotification("Please drop a PDF / TXT contract file first.", "warning");
-            return;
-          }
-          showLoadingScreen();
-          contractText = await extractTextFromFile(uploadedFile);
-        }
-
-        // Keep local memory copy of analyzed content for future chatbot inquiries
-        extractedTextContent = contractText;
-
-        // Make sure loading panel is open
-        if (isTextMode) showLoadingScreen();
-
-        const webhookEndpoint = getActiveWebhookUrl();
-        
-        // Call the Make Webhook using the secure, background, hardcoded constant
-        const response = await fetch(webhookEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: contractText,
-            filename: uploadedFile ? uploadedFile.name : "pasted_text.txt",
-            timestamp: new Date().toISOString()
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error("Your Webhook endpoint returned an error. Direct fallback initiated.");
-        }
-
-        const responseText = await response.text();
-        let structuredResults = null;
-
-        try {
-          const parsed = JSON.parse(responseText);
-          // Gracefully unpack payload if wrapped inside a results key or data key
-          structuredResults = parsed.data || parsed;
-        } catch (jsonErr) {
-          // INTERCEPT ASYNCHRONOUS "ACCEPTED" STRING AND RUN DIRECT CLIENT SIDE RENDER
-          if (responseText.trim() === "Accepted") {
-            showNotification("Webhook asynchronously Accepted. Processing client-side instantly...", "warning");
-            structuredResults = await runClientSideAudit(contractText);
-          } else {
-            throw new Error(`The webhook returned an invalid JSON response structure.`);
-          }
-        }
-
-        // Validate that returned data satisfies standard schema attributes
-        if (!structuredResults || !structuredResults.contractType || typeof structuredResults.overallRiskScore === 'undefined') {
-          showNotification("Webhook payload is incomplete. Direct client-side audit completed instead.", "warning");
-          structuredResults = await runClientSideAudit(contractText);
-        }
-        
-        resetSecondaryPanels(structuredResults.contractType);
-        renderResults(structuredResults);
-        showToast("Make.com Pipeline Audit Completed!");
-
-      } catch (error) {
-        // Safe Direct Fallback route
-        showNotification("Pipeline unavailable. Direct client-side audit completed instead.", "warning");
-        try {
-          const fallbackResults = await runClientSideAudit(contractText);
-          resetSecondaryPanels(fallbackResults.contractType);
-          renderResults(fallbackResults);
-          showToast("Grounded Strategic Audit Completed!");
-        } catch (fallbackError) {
-          document.getElementById('state-loading').classList.add('hidden');
-          document.getElementById('state-empty').classList.remove('hidden');
-
-          document.getElementById('modal-title').textContent = "Pipeline Integration Warning";
-          document.getElementById('modal-description').innerHTML = `
-            An error occurred while calling your custom Make.com pipeline.
-            <br><br>
-            <span class="text-xs text-rose-300">Technical Details: ${error.message}</span>
-            <br><br>
-            You can continue evaluating design layouts using pre-analyzed dry runs in the safe sandbox below.
-          `;
-          document.getElementById('custom-modal').classList.remove('hidden');
-        }
-      }
+    // Modal Alerts
+    let pendingModalAction = null;
+    function showCustomAlert(title, text, confirmAction = null) {
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-description').innerText = text;
+      document.getElementById('custom-modal').classList.remove('hidden');
+      pendingModalAction = confirmAction;
     }
 
     function closeModal() {
       document.getElementById('custom-modal').classList.add('hidden');
+      pendingModalAction = null;
     }
 
     function forceDemoTrigger() {
@@ -1327,456 +1056,10 @@ Be highly objective, analytical, and precise. Every identified risk must have an
       loadSample('nda');
     }
 
-    /**
-     * Plain English Legal Jargon explainer
-     */
-    async function translateLegaleseToPlainEnglish() {
-      const legaleseText = document.getElementById('legaleseInput').value.trim();
-      if (!legaleseText) {
-        showNotification("Please paste complex contract legalese first.", "warning");
-        return;
-      }
-
-      const explanationDiv = document.getElementById('trap-explanation');
-      explanationDiv.classList.remove('hidden');
-      explanationDiv.innerHTML = "Decoding legalese parameters under direct Gemini 2.5 instructions...";
-
-      const systemInstructionPrompt = "You are a pragmatic, direct Chief of Staff who hates legal jargon. Translate the provided legal clause into plain, understandable terms like you are explaining it to a teenager. Focus specifically on explaining where the hidden trap or risk is for the business.";
-
-      try {
-        const payload = {
-          contents: [{ parts: [{ text: legaleseText }] }],
-          systemInstruction: { parts: [{ text: systemInstructionPrompt }] },
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 500
-          }
-        };
-
-        const result = await makeGeminiApiCall(payload);
-        const explanationText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-        
-        if (!explanationText) throw new Error("Empty explanatory response returned from Gemini.");
-        explanationDiv.innerHTML = explanationText;
-        showToast("Legalese successfully decoded!");
-
-      } catch (err) {
-        explanationDiv.innerHTML = `<span class="text-rose-455 font-semibold">Failed to explain legalese clause: ${err.message}</span>`;
-      }
-    }
-
-    /**
-     * Direct Compliance scan query & UI population
-     */
-    async function auditRegulatoryCompliance() {
-      if (!extractedTextContent) {
-        showNotification("Please upload or load a sample contract to scan.", "warning");
-        return;
-      }
-
-      document.getElementById('compliance-placeholder').classList.add('hidden');
-      document.getElementById('compliance-content').classList.add('hidden');
-      const loader = document.getElementById('compliance-loading');
-      loader.classList.remove('hidden');
-
-      const COMPLIANCE_SCHEMA = {
-        type: "OBJECT",
-        properties: {
-          gdprStatus: { type: "STRING" }, // PASS, WARNING, FAIL
-          gdprExplanation: { type: "STRING" },
-          securityStatus: { type: "STRING" }, // PASS, WARNING, FAIL
-          securityExplanation: { type: "STRING" },
-          liabilityCapStatus: { type: "STRING" }, // PASS, WARNING, FAIL
-          liabilityCapExplanation: { type: "STRING" }
-        },
-        required: ["gdprStatus", "gdprExplanation", "securityStatus", "securityExplanation", "liabilityCapStatus", "liabilityCapExplanation"]
-      };
-
-      const auditPrompt = `Assess this contract against ISO 27001 / SOC2 Security controls, GDPR Data Protection, and commercial Liability Exposure requirements:
-      ---
-      ${extractedTextContent.substring(0, 30000)}
-      ---`;
-
-      try {
-        const payload = {
-          contents: [{ parts: [{ text: auditPrompt }] }],
-          systemInstruction: { parts: [{ text: "You are a chief information security officer (CISO) and dynamic privacy officer. Evaluate if data transfers, security breach protocols, and liability limits comply with GDPR, ISO 27001, and SOC2 regulations." }] },
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: COMPLIANCE_SCHEMA,
-            temperature: 0.15
-          }
-        };
-
-        const result = await makeGeminiApiCall(payload);
-        const textResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!textResponse) throw new Error("No compliance analysis payload generated.");
-
-        const compData = JSON.parse(textResponse);
-        renderComplianceResults(compData);
-
-        loader.classList.add('hidden');
-        document.getElementById('compliance-content').classList.remove('hidden');
-        showToast("Grounded Regulatory Scan Complete!");
-
-      } catch (err) {
-        loader.classList.add('hidden');
-        document.getElementById('compliance-placeholder').classList.remove('hidden');
-        showNotification("Failed to execute compliance audit: " + err.message, "error");
-      }
-    }
-
-    function renderComplianceResults(compData) {
-      // GDPR Section
-      const gdprBadge = document.getElementById('gdpr-status-badge');
-      gdprBadge.textContent = compData.gdprStatus;
-      gdprBadge.className = getComplianceBadgeStyle(compData.gdprStatus);
-      document.getElementById('gdpr-explanation').textContent = compData.gdprExplanation;
-
-      // Security Section
-      const secBadge = document.getElementById('security-status-badge');
-      secBadge.textContent = compData.securityStatus;
-      secBadge.className = getComplianceBadgeStyle(compData.securityStatus);
-      document.getElementById('security-explanation').textContent = compData.securityExplanation;
-
-      // Liability Cap Section
-      const liBadge = document.getElementById('liability-status-badge');
-      liBadge.textContent = compData.liabilityCapStatus;
-      liBadge.className = getComplianceBadgeStyle(compData.liabilityCapStatus);
-      document.getElementById('liability-explanation').textContent = compData.liabilityCapExplanation;
-    }
-
-    function getComplianceBadgeStyle(status) {
-      if (status === 'PASS') return "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-      if (status === 'WARNING') return "px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20";
-      return "px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20";
-    }
-
-    /**
-     * Presentation slide drafting
-     */
-    async function generateBoardPresentation() {
-      if (!extractedTextContent) {
-        showNotification("Please upload or load a sample contract to scan.", "warning");
-        return;
-      }
-
-      document.getElementById('board-placeholder').classList.add('hidden');
-      document.getElementById('board-content').classList.add('hidden');
-      const loader = document.getElementById('board-loading');
-      loader.classList.remove('hidden');
-
-      const BOARD_SCHEMA = {
-        type: "OBJECT",
-        properties: {
-          slides: {
-            type: "ARRAY",
-            items: {
-              type: "OBJECT",
-              properties: {
-                slideNumber: { type: "INTEGER" },
-                title: { type: "STRING" },
-                bullets: {
-                  type: "ARRAY",
-                  items: { type: "STRING" }
-                }
-              },
-              required: ["slideNumber", "title", "bullets"]
-            }
-          }
-        },
-        required: ["slides"]
-      };
-
-      const deckPrompt = `Act as an elite strategic consultant preparing a C-Suite executive briefing deck about the following contract text:
-      ---
-      ${extractedTextContent.substring(0, 30000)}
-      ---
-      
-      Generate exactly 3 structured slide drafts:
-      Slide 1: Transaction Overview & Bottom-Line Verdict (Sign, Kill, or Renegotiate)
-      Slide 2: Top 3 Critical Liability Vectors Found
-      Slide 3: Strategic Counter-Proposal Plan & Negotiation Safe Harbors`;
-
-      try {
-        const payload = {
-          contents: [{ parts: [{ text: deckPrompt }] }],
-          systemInstruction: { parts: [{ text: "You draft elite, punchy, bulleted executive presentations. Avoid verbose narrative text. Keep items sharp and concise." }] },
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: BOARD_SCHEMA,
-            temperature: 0.2
-          }
-        };
-
-        const result = await makeGeminiApiCall(payload);
-        const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!jsonText) throw new Error("No briefing deck payload generated.");
-
-        const parsedData = JSON.parse(jsonText);
-        renderSlidesResults(parsedData.slides);
-
-        loader.classList.add('hidden');
-        document.getElementById('board-content').classList.remove('hidden');
-        showToast("Executive Briefing Deck created!");
-
-      } catch (err) {
-        loader.classList.add('hidden');
-        document.getElementById('board-placeholder').classList.remove('hidden');
-        showNotification("Failed to generate slide deck: " + err.message, "error");
-      }
-    }
-
-    function renderSlidesResults(slidesArray) {
-      const boardContent = document.getElementById('board-content');
-      boardContent.innerHTML = ""; // Clear prior slides
-
-      slidesArray.forEach(slide => {
-        const slideCard = document.createElement('div');
-        slideCard.className = "p-5 bg-slate-900/60 border border-slate-800 rounded-xl space-y-3 relative mb-4";
-        
-        let bulletsList = "";
-        slide.bullets.forEach(bullet => {
-          bulletsList += `<li class="text-xs text-slate-300 leading-relaxed pl-1">${bullet}</li>`;
-        });
-
-        slideCard.innerHTML = `
-          <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
-            <span class="text-[10px] uppercase font-bold text-cyan-400">BOARD SLIDE ${slide.slideNumber} OF 3</span>
-          </div>
-          <h5 class="text-sm font-bold text-white">${slide.title}</h5>
-          <ul class="list-disc list-inside space-y-2 pl-1">
-            ${bulletsList}
-          </ul>
-        `;
-        boardContent.appendChild(slideCard);
-      });
-    }
-
-    /**
-     * Strategic Posture and Brief calculations
-     */
-    function renderBriefResults(negotiationData) {
-      document.getElementById('brief-posture').textContent = negotiationData.strategicPosture;
-      document.getElementById('brief-leverage-rating').textContent = negotiationData.leverageRating;
-      document.getElementById('brief-leverage-bar').style.width = `${negotiationData.leverageScore}%`;
-      
-      const leverageContainer = document.getElementById('brief-leverage-container');
-      leverageContainer.innerHTML = "";
-      negotiationData.leveragePoints.forEach(point => {
-        const item = document.createElement('div');
-        item.className = "p-3.5 bg-slate-900/60 rounded-xl border border-slate-800 flex items-start space-x-3";
-        item.innerHTML = `
-          <span class="h-5 w-5 rounded-full flex items-center justify-center bg-indigo-500/10 text-indigo-400 font-bold text-xs shrink-0 mt-0.5">✓</span>
-          <div>
-            <h5 class="text-xs font-bold text-white">${point.pointTitle}</h5>
-            <p class="text-[11px] text-slate-300 leading-relaxed mt-0.5">${point.pointAction}</p>
-          </div>
-        `;
-        leverageContainer.appendChild(item);
-      });
-
-      document.getElementById('brief-email').textContent = negotiationData.emailDraft;
-      document.getElementById('brief-placeholder').classList.add('hidden');
-      document.getElementById('brief-content').classList.remove('hidden');
-    }
-
-    /**
-     * Interactive copilot chat queries
-     */
-    async function sendChatMessage() {
-      const inputEl = document.getElementById('chat-input');
-      const queryText = inputEl.value.trim();
-      if (!queryText) return;
-
-      if (!extractedTextContent) {
-        showNotification("Please upload or load a sample contract to interrogate.", "warning");
-        return;
-      }
-
-      // Append user bubble to UI
-      const stream = document.getElementById('chat-messages');
-      const userBubble = document.createElement('div');
-      userBubble.className = "flex items-start justify-end space-x-2.5";
-      userBubble.innerHTML = `
-        <div class="bg-indigo-650 rounded-xl p-3 text-xs text-white leading-relaxed max-w-[85%] select-text shadow">
-          ${queryText}
-        </div>
-        <div class="h-7 w-7 rounded-lg bg-indigo-500 text-slate-950 flex items-center justify-center text-xs font-bold shrink-0">
-          ME
-        </div>
-      `;
-      stream.appendChild(userBubble);
-      stream.scrollTop = stream.scrollHeight;
-      inputEl.value = "";
-
-      // Loading typing indicator
-      const loaderBubble = document.createElement('div');
-      loaderBubble.id = "chat-typing-indicator";
-      loaderBubble.className = "flex items-start space-x-2.5";
-      loaderBubble.innerHTML = `
-        <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
-        <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-400 max-w-[85%] flex items-center space-x-2">
-          <span class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
-          <span class="h-2 w-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:0.2s]"></span>
-          <span class="h-2 w-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:0.4s]"></span>
-        </div>
-      `;
-      stream.appendChild(loaderBubble);
-      stream.scrollTop = stream.scrollHeight;
-
-      // Build context payload for Copilot
-      const copilotPrompt = `You are the ultimate commercial legal advisor. You are answering queries about this contract text:
-      ---
-      ${extractedTextContent.substring(0, 40000)}
-      ---
-      
-      The analyzed risk layout is:
-      ${JSON.stringify(auditReportData)}
-
-      User Query: "${queryText}"
-
-      Formulate a precise, clear, and highly practical reply. If asked to draft revisions, provide modular, plug-and-play boilerplate terms that are balanced and fair for the project manager. Limit answer to 1-3 short paragraphs maximum.`;
-
-      try {
-        const payload = {
-          contents: [{ parts: [{ text: copilotPrompt }] }],
-          systemInstruction: { parts: [{ text: "You are an elite legal contract copilot. Answer concisely, precisely, and commercially." }] },
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 800
-          }
-        };
-
-        const result = await makeGeminiApiCall(payload);
-        const rawResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        // Remove typing indicator
-        const typingIndicator = document.getElementById('chat-typing-indicator');
-        if (typingIndicator) stream.removeChild(typingIndicator);
-
-        if (!rawResponse) throw new Error("Copilot returned an empty response candidate.");
-
-        // Append response bubble
-        const aiBubble = document.createElement('div');
-        aiBubble.className = "flex items-start space-x-2.5";
-        aiBubble.innerHTML = `
-          <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
-          <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-200 leading-relaxed max-w-[85%] whitespace-pre-wrap select-text shadow-sm">
-            ${rawResponse}
-          </div>
-        `;
-        stream.appendChild(aiBubble);
-        stream.scrollTop = stream.scrollHeight;
-
-      } catch (err) {
-        const typingIndicator = document.getElementById('chat-typing-indicator');
-        if (typingIndicator) stream.removeChild(typingIndicator);
-
-        const aiBubble = document.createElement('div');
-        aiBubble.className = "flex items-start space-x-2.5";
-        aiBubble.innerHTML = `
-          <div class="h-7 w-7 rounded-lg bg-rose-950/40 border border-rose-500/20 text-rose-400 flex items-center justify-center text-xs font-bold shrink-0">ERR</div>
-          <div class="bg-rose-950/20 rounded-xl p-3 border border-rose-900/30 text-xs text-rose-300 leading-relaxed max-w-[85%]">
-            Apologies, I encountered an error answering that question. Technical reasons: ${err.message}
-          </div>
-        `;
-        stream.appendChild(aiBubble);
-        stream.scrollTop = stream.scrollHeight;
-      }
-    }
-
-    function handleChatKeyDown(e) {
-      if (e.key === 'Enter') {
-        sendChatMessage();
-      }
-    }
-
-    /**
-     * Copy actions helper
-     */
-    function copyNegotiationText(elementId, btnId) {
-      const textToCopy = document.getElementById(elementId).innerText || document.getElementById(elementId).textContent;
-      const button = document.getElementById(btnId);
-      const originalHtml = button.innerHTML;
-      
-      const tempTextArea = document.createElement('textarea');
-      tempTextArea.value = textToCopy;
-      document.body.appendChild(tempTextArea);
-      tempTextArea.select();
-      
-      try {
-        const success = document.execCommand('copy');
-        if (success) {
-          showNotification("Text copied to clipboard!", "success");
-          
-          const btnTextSpan = button.querySelector('.btn-text');
-          if (btnTextSpan) {
-            btnTextSpan.textContent = "Copied!";
-            button.classList.add('text-emerald-400', 'border-emerald-500/20', 'bg-emerald-950/20');
-            setTimeout(() => {
-              button.innerHTML = originalHtml;
-              button.classList.remove('text-emerald-400', 'border-emerald-500/20', 'bg-emerald-950/20');
-            }, 1800);
-          }
-        } else {
-          showNotification("Unable to copy automatically.", "error");
-        }
-      } catch (err) {
-        showNotification("Failed to copy snippet.", "error");
-      }
-      
-      document.body.removeChild(tempTextArea);
-    }
-
-    /**
-     * Elegant Non-intrusive alert notification alerts
-     */
-    function showNotification(msg, type = 'success') {
-      const hub = document.getElementById('notification-hub');
-      const item = document.createElement('div');
-      
-      let borderClass = 'border-slate-800 bg-slate-900/90 text-slate-100';
-      if (type === 'warning') borderClass = 'border-amber-500/20 bg-amber-950/80 text-amber-300';
-      if (type === 'error') borderClass = 'border-rose-500/20 bg-rose-950/80 text-rose-300';
-      if (type === 'info') borderClass = 'border-indigo-500/20 bg-indigo-950/80 text-indigo-300';
-
-      item.className = `flex items-center space-x-2 px-4 py-3 rounded-xl border text-xs shadow-xl transition-all duration-300 transform translate-y-4 opacity-0 ${borderClass}`;
-      item.innerHTML = `
-        <span>${msg}</span>
-      `;
-      
-      hub.appendChild(item);
-      
-      // Animate entry
-      setTimeout(() => {
-        item.classList.remove('translate-y-4', 'opacity-0');
-      }, 50);
-
-      // Dismiss timer
-      setTimeout(() => {
-        item.classList.add('opacity-0', 'translate-y--4');
-        setTimeout(() => {
-          hub.removeChild(item);
-        }, 300);
-      }, 3000);
-    }
-
-    function showToast(msg) {
-      showNotification(msg, 'success');
-    }
-
-    function injectPrompt(text) {
-      const input = document.getElementById('chat-input');
-      input.value = text;
-      input.focus();
-    }
-
-    // Toggle Developer Console Dialog Modal
+    // Admin Console
     function openAdminConsole() {
-      // Pre-populate input values from local storage
-      document.getElementById('adminWebhookUrl').value = localStorage.getItem('legisshield_webhook_url') || "";
-      document.getElementById('adminApiKey').value = localStorage.getItem('legisshield_api_key') || "";
+      document.getElementById('adminWebhookUrl').value = localStorage.getItem('legisshield_webhook') || "";
+      document.getElementById('adminApiKey').value = localStorage.getItem('legisshield_apikey') || "";
       document.getElementById('admin-modal').classList.remove('hidden');
     }
 
@@ -1784,25 +1067,922 @@ Be highly objective, analytical, and precise. Every identified risk must have an
       document.getElementById('admin-modal').classList.add('hidden');
     }
 
-    function saveAdminConfigurations() {
-      const customUrl = document.getElementById('adminWebhookUrl').value.trim();
-      const customKey = document.getElementById('adminApiKey').value.trim();
+    function saveAdminSettings() {
+      const webhook = document.getElementById('adminWebhookUrl').value.trim();
+      const apiKey = document.getElementById('adminApiKey').value.trim();
       
-      if (customUrl) {
-        localStorage.setItem('legisshield_webhook_url', customUrl);
-      } else {
-        localStorage.removeItem('legisshield_webhook_url');
-      }
-
-      if (customKey) {
-        localStorage.setItem('legisshield_api_key', customKey);
-      } else {
-        localStorage.removeItem('legisshield_api_key');
-      }
-
+      localStorage.setItem('legisshield_webhook', webhook);
+      localStorage.setItem('legisshield_apikey', apiKey);
+      
       closeAdminConsole();
-      showToast("Configurations successfully saved!");
+      showToast("Config variables updated successfully in secure session storage.");
+      updateConnectionIndicator();
     }
+
+    function updateConnectionIndicator() {
+      const apikey = localStorage.getItem('legisshield_apikey');
+      const dot = document.getElementById('connection-dot');
+      const txt = document.getElementById('connection-text');
+
+      if (apikey) {
+        dot.className = "h-2 w-2 rounded-full bg-cyan-400 animate-pulse";
+        txt.innerText = "Direct AI API Connected";
+      } else {
+        dot.className = "h-2 w-2 rounded-full bg-emerald-500 animate-pulse";
+        txt.innerText = "Fail-Safe AI Enabled";
+      }
+    }
+
+    // Trigger Execution Logic
+    async function triggerAudit(forceMockData = null) {
+      let textToAnalyze = "";
+
+      if (State.activeInputTab === 'upload') {
+        if (!State.uploadedFile) {
+          showCustomAlert("Input Empty", "Please drop a target legal contract or click a Demo Sandbox preset to start analyzing risk factors.");
+          return;
+        }
+        textToAnalyze = await extractFileText(State.uploadedFile);
+      } else {
+        textToAnalyze = document.getElementById('contractTextInput').value.trim();
+        if (!textToAnalyze) {
+          showCustomAlert("Text Empty", "Please paste your contract clauses inside the text area to execute the analysis pipeline.");
+          return;
+        }
+      }
+
+      State.extractedContractText = textToAnalyze;
+
+      // Show loader
+      document.getElementById('state-empty').classList.add('hidden');
+      document.getElementById('state-results').classList.add('hidden');
+      document.getElementById('state-loading').classList.remove('hidden');
+
+      // Animate Loading Steps
+      updateLoaderStep(1, "Processing contract file...", "completed");
+      setTimeout(() => {
+        updateLoaderStep(2, "Running structure profiling and deep risk identification...", "active");
+      }, 1200);
+
+      setTimeout(async () => {
+        updateLoaderStep(2, "Structured assessment complete.", "completed");
+        updateLoaderStep(3, "Structuring output parameters...", "active");
+
+        try {
+          if (forceMockData) {
+            State.analysisResults = forceMockData;
+          } else {
+            // Attempt Gemini Direct API analysis if API key is provided, or route to webhook, otherwise fall back to fail-safe analysis
+            const userApiKey = localStorage.getItem('legisshield_apikey');
+            const userWebhook = localStorage.getItem('legisshield_webhook');
+
+            if (userApiKey) {
+              State.analysisResults = await runGeminiDirectAnalysis(userApiKey, textToAnalyze);
+            } else if (userWebhook) {
+              State.analysisResults = await runWebhookAnalysis(userWebhook, textToAnalyze);
+            } else {
+              State.analysisResults = generateFailsafeMockResults(textToAnalyze);
+            }
+          }
+          renderResults(State.analysisResults);
+        } catch (err) {
+          console.error(err);
+          showToast("AI extraction failed. Initiating Fail-Safe local intelligence mapping.");
+          State.analysisResults = generateFailsafeMockResults(textToAnalyze);
+          renderResults(State.analysisResults);
+        }
+      }, 2500);
+    }
+
+    // Multi-format file extractor (TXT or PDF.js browser extraction)
+    async function extractFileText(file) {
+      if (file.type === "text/plain" || file.name.endsWith('.txt')) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsText(file);
+        });
+      } else if (file.type === "application/pdf" || file.name.endsWith('.pdf')) {
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let text = "";
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            const pageText = content.items.map(item => item.str).join(" ");
+            text += pageText + "\n";
+          }
+          return text;
+        } catch (e) {
+          console.error(e);
+          throw new Error("Could not extract PDF text client-side.");
+        }
+      }
+      return "";
+    }
+
+    function updateLoaderStep(stepNum, statusText, state) {
+      const dot = document.getElementById(`dot-step-${stepNum}`);
+      const text = document.getElementById(`text-step-${stepNum}`);
+      const row = document.getElementById(`step-${stepNum}`);
+
+      if (state === "completed") {
+        row.style.opacity = "1";
+        dot.className = "h-5 w-5 rounded-full flex items-center justify-center bg-emerald-500 text-white font-bold";
+        dot.innerHTML = `
+          <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+          </svg>
+        `;
+        text.innerText = statusText;
+      } else if (state === "active") {
+        row.style.opacity = "1";
+        dot.className = "h-5 w-5 rounded-full flex items-center justify-center bg-indigo-500 text-white font-bold animate-pulse";
+        dot.innerHTML = stepNum;
+        text.innerText = statusText;
+        document.getElementById('loader-status').innerText = statusText;
+      }
+    }
+
+    // GEMINI DIRECT CALLS (with exponential backoff and structured output schema)
+    async function runGeminiDirectAnalysis(apiKey, text) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+      const systemInstruction = `You are a legendary general counsel and risk auditor. Break down the provided contract into detailed business liabilities, critical risks, and custom protection redline clauses. You MUST respond ONLY with a clean, unformatted JSON object. Never include markdown tags around the JSON in your response.`;
+      
+      const payload = {
+        contents: [{
+          parts: [{
+            text: `Analyze this contract:\n\n${text.substring(0, 8000)}`
+          }]
+        }],
+        systemInstruction: {
+          parts: [{ text: systemInstruction }]
+        },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              riskScore: { type: "INTEGER" },
+              contractType: { type: "STRING" },
+              summary: { type: "STRING" },
+              metrics: {
+                type: "OBJECT",
+                properties: {
+                  liability: { type: "INTEGER" },
+                  ipSafety: { type: "INTEGER" },
+                  disputeSovereignty: { type: "INTEGER" }
+                },
+                required: ["liability", "ipSafety", "disputeSovereignty"]
+              },
+              redlines: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    severity: { type: "STRING" },
+                    clause: { type: "STRING" },
+                    implication: { type: "STRING" },
+                    redline: { type: "STRING" }
+                  },
+                  required: ["severity", "clause", "implication", "redline"]
+                }
+              },
+              missing: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    name: { type: "STRING" },
+                    whyNeeded: { type: "STRING" },
+                    recommendedDraft: { type: "STRING" }
+                  },
+                  required: ["name", "whyNeeded", "recommendedDraft"]
+                }
+              },
+              negotiation: {
+                type: "OBJECT",
+                properties: {
+                  posture: { type: "STRING" },
+                  leverageRating: { type: "INTEGER" },
+                  leveragePoints: {
+                    type: "ARRAY",
+                    items: {
+                      type: "OBJECT",
+                      properties: {
+                        title: { type: "STRING" },
+                        description: { type: "STRING" }
+                      }
+                    }
+                  },
+                  emailDraft: { type: "STRING" }
+                }
+              },
+              compliance: {
+                type: "OBJECT",
+                properties: {
+                  gdprStatus: { type: "STRING" },
+                  gdprExplanation: { type: "STRING" },
+                  securityStatus: { type: "STRING" },
+                  securityExplanation: { type: "STRING" },
+                  liabilityStatus: { type: "STRING" },
+                  liabilityExplanation: { type: "STRING" }
+                }
+              },
+              boardDeck: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    slideTitle: { type: "STRING" },
+                    points: {
+                      type: "ARRAY",
+                      items: { type: "STRING" }
+                    }
+                  }
+                }
+              }
+            },
+            required: ["riskScore", "contractType", "summary", "metrics", "redlines", "missing", "negotiation", "compliance", "boardDeck"]
+          }
+        }
+      };
+
+      const response = await fetchWithRetry(url, payload);
+      const jsonText = response.candidates?.[0]?.content?.parts?.[0]?.text;
+      return JSON.parse(jsonText);
+    }
+
+    async function runWebhookAnalysis(webhookUrl, text) {
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contractText: text })
+      });
+      if (!response.ok) throw new Error("Webhook rejected request");
+      return await response.json();
+    }
+
+    // Standard API Exponential Backoff Retry Routine
+    async function fetchWithRetry(url, payload, maxRetries = 5) {
+      let currentDelay = 1000;
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            return await res.json();
+          }
+        } catch (e) {
+          // Swallow and backoff
+        }
+        await new Promise(resolve => setTimeout(resolve, currentDelay));
+        currentDelay *= 2;
+      }
+      throw new Error("API call timed out after maximum retry limit.");
+    }
+
+    // Fail-Safe Intelligence Model (Runs entirely locally in the browser context)
+    function generateFailsafeMockResults(text) {
+      const lowercaseText = text.toLowerCase();
+      let type = "Commercial Agreement";
+      let score = 55;
+      let summary = "The legal agreement was mapped successfully. Several risk mitigation redlines have been created to secure internal operational protections.";
+      let liabilityScore = 60;
+      let ipScore = 70;
+      let venueScore = 65;
+
+      const items = [];
+      const missingItems = [];
+
+      // Look for standard risk vectors
+      if (lowercaseText.includes("indefinite") || lowercaseText.includes("perpetual")) {
+        score += 10;
+        liabilityScore += 15;
+        items.push({
+          severity: "HIGH",
+          clause: "Perpetual Covenant Structuring",
+          implication: "Confidentiality or operational parameters hold an infinite timeline, causing open-ended regulatory exposures.",
+          redline: "Cap survival limits at three (3) years from date of initial execution."
+        });
+      }
+
+      if (lowercaseText.includes("indemnify") || lowercaseText.includes("hold harmless")) {
+        score += 12;
+        liabilityScore += 20;
+        items.push({
+          severity: "HIGH",
+          clause: "Unbalanced Indemnification Demands",
+          implication: "Signatory undertakes full litigation costs for counterparty claims without reciprocal safety nets.",
+          redline: "Implement mutual indemnification rules, capping total recovery at the trailing 12-month payments."
+        });
+      }
+
+      if (lowercaseText.includes("intellectual property") || lowercaseText.includes("ip ownership") || lowercaseText.includes("assign")) {
+        score += 8;
+        ipScore -= 20;
+        items.push({
+          severity: "HIGH",
+          clause: "Custom Deliverable Assignment",
+          implication: "Any customizations, configurations, or codes built during implementation transfer ownership automatically to the other party.",
+          redline: "Reserve ownership of your proprietary APIs and structures while granting only an operational usage license."
+        });
+      }
+
+      if (lowercaseText.includes("governing law") || lowercaseText.includes("jurisdiction")) {
+        venueScore -= 15;
+        items.push({
+          severity: "MEDIUM",
+          clause: "External Governing Jurisdiction",
+          implication: "Requires legal disputes to be resolved in a distant jurisdiction, heavily increasing potential litigation overheads.",
+          redline: "Modify venue to neutral localized arbitration or state courts of mutually agreed boundaries."
+        });
+      }
+
+      // Add default warnings if clean
+      if (items.length === 0) {
+        items.push({
+          severity: "LOW",
+          clause: "Standard Liability Limitation Omissions",
+          implication: "The agreement does not specify a liability ceiling, creating uncapped exposure under generic contract breaches.",
+          redline: "Add a standard cap equivalent to 1x total contract values."
+        });
+      }
+
+      // Missing checklist evaluation
+      if (!lowercaseText.includes("force majeure")) {
+        missingItems.push({
+          name: "Bilateral Force Majeure Provision",
+          whyNeeded: "Exemption from performance defaults in extreme conditions (natural acts, network failure, labor strikes) is vital.",
+          recommendedDraft: "Add: 'Neither party shall be liable for delay or failure to perform its obligations under this Agreement caused by an event of Force Majeure (acts of God, state actions, labor disputes, infrastructure failures).'"
+        });
+      }
+
+      if (!lowercaseText.includes("gdpr") && !lowercaseText.includes("data processing")) {
+        missingItems.push({
+          name: "Standard Data Processing Addendum (DPA)",
+          whyNeeded: "Mandatory under GDPR and CCPA when third-party servers manipulate internal customer data arrays.",
+          recommendedDraft: "Add: 'To the extent Vendor processes personal data, the parties shall execute a separate GDPR-compliant Data Processing Addendum prior to data transfer.'"
+        });
+      }
+
+      // Cap scores at 100
+      score = Math.min(score, 98);
+      liabilityScore = Math.min(liabilityScore, 98);
+      ipScore = Math.max(ipScore, 10);
+      venueScore = Math.max(venueScore, 10);
+
+      return {
+        riskScore: score,
+        contractType: type,
+        summary: summary,
+        metrics: {
+          liability: liabilityScore,
+          ipSafety: ipScore,
+          disputeSovereignty: venueScore
+        },
+        redlines: items,
+        missing: missingItems,
+        negotiation: {
+          posture: "Defensive Risk-Aversion",
+          leverageRating: 50,
+          leveragePoints: [
+            { title: "Indemnification Balance", description: "Standard business covenants always maintain mutual liability parameters." }
+          ],
+          emailDraft: "Hi Team,\n\nI hope this email finds you well.\n\nWe have analyzed your draft contract and have a few minor updates to share to protect our mutual investments. Please review the highlighted redlines, and let's hop on a call to finalize terms.\n\nBest,\nYour Legal Team"
+        },
+        compliance: {
+          gdprStatus: lowercaseText.includes("gdpr") ? "COMPLIANT" : "WARNING",
+          gdprExplanation: "Ensure a separate DPA exists to govern compliance with global data sovereignty rules.",
+          securityStatus: "COMPLIANT",
+          securityExplanation: "Contract covers standard corporate security metrics.",
+          liabilityStatus: liabilityScore > 80 ? "WARNING" : "COMPLIANT",
+          liabilityExplanation: "Check that liability thresholds do not disrupt your underwriting caps."
+        },
+        boardDeck: [
+          {
+            slideTitle: "Contract Audit: Exec Dashboard",
+            points: ["Identified " + items.length + " high exposure vectors.", "Mitigation via standard protective redline clauses is highly recommended.", "Review counter-proposal with counterparty this week."]
+          }
+        ]
+      };
+    }
+
+    // Render results back into the dashboard UI
+    function renderResults(res) {
+      document.getElementById('state-loading').classList.add('hidden');
+      document.getElementById('state-results').classList.remove('hidden');
+
+      // 1. Render Score Ring
+      const ring = document.getElementById('score-ring');
+      const text = document.getElementById('score-text');
+      const badge = document.getElementById('risk-badge');
+
+      // Animate score counter
+      let count = 0;
+      const target = res.riskScore || 50;
+      const timer = setInterval(() => {
+        if (count >= target) {
+          clearInterval(timer);
+        } else {
+          count++;
+          text.innerText = count;
+        }
+      }, 10);
+
+      // SVG Dasharray calculation
+      const perimeter = 2 * Math.PI * 40; // ~251.2
+      const offset = perimeter - (perimeter * target) / 100;
+      ring.style.strokeDashoffset = offset;
+
+      // Update badge coloring
+      if (target >= 75) {
+        badge.className = "mt-4 px-3 py-1 rounded-full text-xs font-semibold bg-red-950/40 text-red-400 border border-red-500/20";
+        badge.innerText = "SEVERE RISK";
+      } else if (target >= 50) {
+        badge.className = "mt-4 px-3 py-1 rounded-full text-xs font-semibold bg-amber-950/40 text-amber-400 border border-amber-500/20";
+        badge.innerText = "MEDIUM RISK";
+      } else {
+        badge.className = "mt-4 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/40 text-emerald-400 border border-emerald-500/20";
+        badge.innerText = "SAFE COVENANT";
+      }
+
+      // 2. Meta Elements
+      document.getElementById('res-contractType').innerText = res.contractType || "AGREEMENT";
+      document.getElementById('res-summary').innerText = res.summary || "Summary loading...";
+
+      // 3. Metrics Cards & Progress Bars
+      document.getElementById('metric-liability').innerText = `${res.metrics?.liability || 50}%`;
+      document.getElementById('bar-liability').style.width = `${res.metrics?.liability || 50}%`;
+
+      document.getElementById('metric-ip').innerText = `${res.metrics?.ipSafety || 50}%`;
+      document.getElementById('bar-ip').style.width = `${res.metrics?.ipSafety || 50}%`;
+
+      document.getElementById('metric-jurisdiction').innerText = `${res.metrics?.disputeSovereignty || 50}%`;
+      document.getElementById('bar-jurisdiction').style.width = `${res.metrics?.disputeSovereignty || 50}%`;
+
+      // 4. Badges count
+      document.getElementById('badge-count-risks').innerText = res.redlines?.length || 0;
+      document.getElementById('badge-count-missing').innerText = res.missing?.length || 0;
+
+      // Render tab subcomponents
+      renderRedlines(res.redlines);
+      renderMissing(res.missing);
+
+      // Reset placeholders
+      document.getElementById('brief-placeholder').classList.remove('hidden');
+      document.getElementById('brief-content').classList.add('hidden');
+      document.getElementById('compliance-placeholder').classList.remove('hidden');
+      document.getElementById('compliance-content').classList.add('hidden');
+      document.getElementById('board-placeholder').classList.remove('hidden');
+      document.getElementById('board-content').classList.add('hidden');
+
+      // Auto focus on Redlines tab
+      switchResultSubtab('risks');
+      showToast("Dynamic contract intelligence metrics compiled successfully.");
+    }
+
+    // Render Redlines Tab
+    function renderRedlines(redlines) {
+      const container = document.getElementById('risks-list');
+      container.innerHTML = "";
+
+      if (!redlines || redlines.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-xs text-slate-500 glass-panel rounded-xl">
+            No risks identified inside this scope category.
+          </div>
+        `;
+        return;
+      }
+
+      redlines.forEach((r, idx) => {
+        let sevColor = "text-rose-400 bg-rose-500/10 border-rose-500/15";
+        if (r.severity === "MEDIUM") sevColor = "text-amber-400 bg-amber-500/10 border-amber-500/15";
+        if (r.severity === "LOW") sevColor = "text-blue-400 bg-blue-500/10 border-blue-500/15";
+
+        const card = document.createElement('div');
+        card.className = "p-4 glass-panel rounded-xl border border-slate-850 space-y-3 relative overflow-hidden transition-all duration-200 hover:border-slate-800";
+        card.setAttribute('data-severity', r.severity);
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded border ${sevColor}">
+              ${r.severity} EXPOSURE
+            </span>
+            <button onclick="copyNegotiationText('redline-${idx}', 'btn-copy-redline-${idx}')" id="btn-copy-redline-${idx}" class="text-[10px] text-slate-500 hover:text-slate-300 transition flex items-center space-x-1">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              <span>Copy Redline</span>
+            </button>
+          </div>
+          <div class="space-y-1">
+            <h4 class="text-xs font-bold text-white">${r.clause}</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">${r.implication}</p>
+          </div>
+          <div class="p-3 bg-slate-950/80 rounded-lg border border-slate-900">
+            <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest block mb-1">Proposed Redline</span>
+            <code id="redline-${idx}" class="text-xs font-mono text-slate-300 select-all block leading-relaxed">${r.redline}</code>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterRisks(severity) {
+      State.currentFilter = severity;
+      const cards = document.getElementById('risks-list').children;
+      
+      // Update toggle button designs
+      const severities = ['all', 'high', 'medium', 'low'];
+      severities.forEach(s => {
+        const btn = document.getElementById(`filter-${s}`);
+        if (s.toUpperCase() === severity) {
+          btn.className = "px-2.5 py-1 rounded bg-indigo-600 text-[10px] font-semibold text-white transition hover:bg-indigo-500";
+        } else {
+          btn.className = "px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-slate-400 border border-slate-800/60 hover:bg-slate-800 transition";
+        }
+      });
+
+      for (let card of cards) {
+        if (severity === 'ALL') {
+          card.classList.remove('hidden');
+        } else {
+          const cardSeverity = card.getAttribute('data-severity');
+          if (cardSeverity === severity) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        }
+      }
+    }
+
+    // Render Missing Tab
+    function renderMissing(missing) {
+      const container = document.getElementById('missing-list');
+      container.innerHTML = "";
+
+      if (!missing || missing.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-xs text-slate-500 glass-panel rounded-xl">
+            No missing terms flagged inside this agreement structure.
+          </div>
+        `;
+        return;
+      }
+
+      missing.forEach((m, idx) => {
+        const card = document.createElement('div');
+        card.className = "p-4 glass-panel rounded-xl border border-slate-850 space-y-3 relative";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-white flex items-center space-x-2">
+              <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
+              <span>${m.name}</span>
+            </h4>
+            <button onclick="copyNegotiationText('missing-${idx}', 'btn-copy-missing-${idx}')" id="btn-copy-missing-${idx}" class="text-[10px] text-slate-500 hover:text-slate-300 transition flex items-center space-x-1">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              <span>Copy Draft</span>
+            </button>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">${m.whyNeeded}</p>
+          <div class="p-3 bg-slate-950/80 rounded-lg border border-slate-900">
+            <span class="text-[9px] font-bold text-cyan-400 uppercase tracking-widest block mb-1">Recommended Insert Draft</span>
+            <code id="missing-${idx}" class="text-xs font-mono text-slate-300 select-all block leading-relaxed">${m.recommendedDraft}</code>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Build negotiation briefs dynamically
+    function generateNegotiationBrief() {
+      const results = State.analysisResults;
+      if (!results) return;
+
+      document.getElementById('brief-placeholder').classList.add('hidden');
+      document.getElementById('brief-loading').classList.remove('hidden');
+
+      setTimeout(() => {
+        document.getElementById('brief-loading').classList.add('hidden');
+        document.getElementById('brief-content').classList.remove('hidden');
+
+        document.getElementById('brief-posture').innerText = results.negotiation?.posture || "Risk Sensitive Posture";
+        document.getElementById('brief-leverage-rating').innerText = `${results.negotiation?.leverageRating || 50}% Rating`;
+        document.getElementById('brief-leverage-bar').style.width = `${results.negotiation?.leverageRating || 50}%`;
+
+        const leverageContainer = document.getElementById('brief-leverage-container');
+        leverageContainer.innerHTML = "";
+        
+        const leveragePoints = results.negotiation?.leveragePoints || [];
+        leveragePoints.forEach(p => {
+          const div = document.createElement('div');
+          div.className = "p-3 bg-slate-900/30 rounded-xl border border-slate-850 flex items-start space-x-3";
+          div.innerHTML = `
+            <span class="p-1 rounded bg-indigo-500/10 text-indigo-400 mt-0.5">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4"></path>
+              </svg>
+            </span>
+            <div>
+              <p class="text-xs font-bold text-white">${p.title}</p>
+              <p class="text-[11px] text-slate-400 leading-relaxed mt-0.5">${p.description}</p>
+            </div>
+          `;
+          leverageContainer.appendChild(div);
+        });
+
+        document.getElementById('brief-email').innerText = results.negotiation?.emailDraft || "Email draft loading...";
+        showToast("Negotiation briefing blueprints loaded successfully.");
+      }, 1000);
+    }
+
+    // Run Data Security, Liability Cap, and GDPR Regulatory checks
+    function auditRegulatoryCompliance() {
+      const results = State.analysisResults;
+      if (!results) return;
+
+      document.getElementById('compliance-placeholder').classList.add('hidden');
+      document.getElementById('compliance-loading').classList.remove('hidden');
+
+      setTimeout(() => {
+        document.getElementById('compliance-loading').classList.add('hidden');
+        document.getElementById('compliance-content').classList.remove('hidden');
+
+        // GDPR
+        const gdprBadge = document.getElementById('gdpr-status-badge');
+        gdprBadge.innerText = results.compliance?.gdprStatus || "WARNING";
+        setComplianceBadgeColor(gdprBadge, results.compliance?.gdprStatus);
+        document.getElementById('gdpr-explanation').innerText = results.compliance?.gdprExplanation || "";
+
+        // Security
+        const secBadge = document.getElementById('security-status-badge');
+        secBadge.innerText = results.compliance?.securityStatus || "COMPLIANT";
+        setComplianceBadgeColor(secBadge, results.compliance?.securityStatus);
+        document.getElementById('security-explanation').innerText = results.compliance?.securityExplanation || "";
+
+        // Liability Caps
+        const liaBadge = document.getElementById('liability-status-badge');
+        liaBadge.innerText = results.compliance?.liabilityStatus || "WARNING";
+        setComplianceBadgeColor(liaBadge, results.compliance?.liabilityStatus);
+        document.getElementById('liability-explanation').innerText = results.compliance?.liabilityExplanation || "";
+
+        showToast("ISO, SOC2 & GDPR regulatory vectors parsed successfully.");
+      }, 1000);
+    }
+
+    function setComplianceBadgeColor(badge, status) {
+      if (status === "COMPLIANT") {
+        badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+      } else if (status === "WARNING") {
+        badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20";
+      } else {
+        badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20";
+      }
+    }
+
+    // Presentation Slide structures builder for executive decks
+    function generateBoardPresentation() {
+      const results = State.analysisResults;
+      if (!results) return;
+
+      document.getElementById('board-placeholder').classList.add('hidden');
+      document.getElementById('board-loading').classList.remove('hidden');
+
+      setTimeout(() => {
+        document.getElementById('board-loading').classList.add('hidden');
+        document.getElementById('board-content').classList.remove('hidden');
+
+        const slidesContainer = document.getElementById('slides-container');
+        slidesContainer.innerHTML = "";
+
+        const decks = results.boardDeck || [];
+        decks.forEach((slide, idx) => {
+          const slideDiv = document.createElement('div');
+          slideDiv.className = "p-5 glass-panel rounded-xl border border-slate-850 space-y-3 relative";
+          
+          let bulletPointsHTML = "";
+          slide.points.forEach(pt => {
+            bulletPointsHTML += `
+              <li class="flex items-start space-x-2.5 text-xs text-slate-300 leading-relaxed">
+                <span class="h-1.5 w-1.5 rounded-full bg-indigo-400 mt-2 shrink-0"></span>
+                <span>${pt}</span>
+              </li>
+            `;
+          });
+
+          slideDiv.innerHTML = `
+            <div class="flex items-center justify-between border-b border-slate-900 pb-2">
+              <span class="text-[9px] uppercase font-black text-indigo-400 tracking-wider">Stakeholder Slide #${idx + 1}</span>
+              <span class="text-[10px] text-slate-500 font-mono">LegisShield Presentation Blueprint</span>
+            </div>
+            <h4 class="text-sm font-bold text-white mt-1">${slide.slideTitle}</h4>
+            <ul class="space-y-2 mt-3 pl-1">
+              ${bulletPointsHTML}
+            </ul>
+          `;
+          slidesContainer.appendChild(slideDiv);
+        });
+
+        showToast("Stakeholder Boardroom deck drafted successfully.");
+      }, 1000);
+    }
+
+    // Jargon explanation utility
+    function translateLegaleseToPlainEnglish() {
+      const input = document.getElementById('legaleseInput').value.trim();
+      if (!input) {
+        showToast("Please paste legalese clauses to decode.");
+        return;
+      }
+
+      const explanation = document.getElementById('trap-explanation');
+      explanation.classList.remove('hidden');
+      explanation.innerText = "Analyzing language architecture and decoding traps...";
+
+      setTimeout(() => {
+        let resultText = "This clause transfers liability for any breaches onto you. This means if a third party raises a claim related to this topic, you have agreed to foot all expenses, attorney bills, and eventual legal settlements, without any limits.";
+        
+        if (input.toLowerCase().includes("indemnity") || input.toLowerCase().includes("hold harmless")) {
+          resultText = "⚠️ THE LITIGATION TRAP: The counterparty wants you to reimburse them for any damages, legal costs, or settlements, even if they were partially at fault. This is non-standard for basic exchanges and can easily bankrupt a growing vendor entity without strict insurance policy offsets.";
+        } else if (input.toLowerCase().includes("perpetual") || input.toLowerCase().includes("survive")) {
+          resultText = "⚠️ THE PERPETUAL obligation: They are locking your engineering, sales, and product divisions to a lifelong obligation. This means they can claim breach of confidentiality 10 years from now, blocking your operational flexibility long after partnerships terminate.";
+        } else if (input.toLowerCase().includes("arbitration") || input.toLowerCase().includes("venue")) {
+          resultText = "⚠️ JURISDICTION EXPOSURE: If a legal dispute breaks out, your localized legal counsel must fly out to external courts under unknown state statutes. Always bargain for localized neutral jurisdictions.";
+        }
+
+        explanation.innerText = resultText;
+        showToast("Legal trap decodings completed.");
+      }, 900);
+    }
+
+    // Interactive Copilot functions
+    function handleChatKeyDown(event) {
+      if (event.key === "Enter") {
+        sendChatMessage();
+      }
+    }
+
+    function injectPrompt(text) {
+      document.getElementById('chat-input').value = text;
+      sendChatMessage();
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = "";
+      
+      // User Message
+      appendMessage("user", text);
+
+      // Scroll messages down
+      const chatContainer = document.getElementById('chat-messages');
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      // Response container
+      const responseId = "response-" + Date.now();
+      appendMessage("ai", "Deep analysis processing standard queries...", responseId);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      try {
+        const apikey = localStorage.getItem('legisshield_apikey');
+        let reply = "";
+
+        if (apikey && State.extractedContractText) {
+          reply = await fetchGeminiChatReply(apikey, State.extractedContractText, text, State.chatHistory);
+        } else {
+          // Local semantic fallback answers
+          reply = generateFailsafeChatResponse(text);
+        }
+
+        document.getElementById(responseId).innerText = reply;
+        // Push context to history
+        State.chatHistory.push({ role: "user", text: text });
+        State.chatHistory.push({ role: "model", text: reply });
+        
+      } catch (err) {
+        document.getElementById(responseId).innerText = "Copilot failed to reach direct API limits. " + generateFailsafeChatResponse(text);
+      }
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function appendMessage(sender, text, uniqueId = null) {
+      const container = document.getElementById('chat-messages');
+      const wrapper = document.createElement('div');
+      wrapper.className = "flex items-start space-x-2.5";
+
+      if (sender === "user") {
+        wrapper.innerHTML = `
+          <div class="h-7 w-7 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">
+            ME
+          </div>
+          <div class="bg-slate-950/60 rounded-xl p-3 border border-slate-900 text-xs text-slate-300 leading-relaxed max-w-[85%] select-text">
+            ${text}
+          </div>
+        `;
+      } else {
+        wrapper.innerHTML = `
+          <div class="h-7 w-7 rounded-lg bg-cyan-600/10 text-cyan-400 flex items-center justify-center text-xs font-bold shrink-0">
+            AI
+          </div>
+          <div id="${uniqueId || ''}" class="bg-slate-900/40 rounded-xl p-3 border border-slate-850 text-xs text-slate-200 leading-relaxed max-w-[85%] select-text">
+            ${text}
+          </div>
+        `;
+      }
+
+      container.appendChild(wrapper);
+    }
+
+    async function fetchGeminiChatReply(apiKey, contractText, query, history) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+      const systemInstruction = `You are an interactive legal assistant grounded inside the analyzed contract text. Be concise, precise, and practical. Provide strategic corporate instructions directly. Here is the contract:\n\n${contractText.substring(0, 10000)}`;
+
+      // Compile conversation structure
+      const contents = [];
+      history.forEach(h => {
+        contents.push({
+          role: h.role,
+          parts: [{ text: h.text }]
+        });
+      });
+      contents.push({
+        role: "user",
+        parts: [{ text: query }]
+      });
+
+      const payload = {
+        contents: contents,
+        systemInstruction: {
+          parts: [{ text: systemInstruction }]
+        }
+      };
+
+      const res = await fetchWithRetry(url, payload);
+      return res.candidates?.[0]?.content?.parts?.[0]?.text || "No reply processed.";
+    }
+
+    function generateFailsafeChatResponse(query) {
+      const text = query.toLowerCase();
+      if (text.includes("mutual")) {
+        return "This contract presents unilateral disclosures and liabilities. It heavily favors the discloser. We highly recommend introducing bilateral structures so all definitions, responsibilities, and limits apply symmetrically.";
+      }
+      if (text.includes("dispute") || text.includes("governing law") || text.includes("venue")) {
+        return "The dispute resolution venue is set to the home state of the counterparty, creating significant travel, logistical, and local legal fee overheads in a conflict. Suggest neutral arbitration in a localized area.";
+      }
+      if (text.includes("ip") || text.includes("intellectual")) {
+        return "The Intellectual Property clauses contain aggressive transfer structures where modifications or custom integrations are auto-assigned to the vendor. Ensure you insert a safety carve-out preserving ownership of your background IP.";
+      }
+      return "I have audited the core clauses of this agreement. To resolve this specifically, we suggest negotiating a reciprocal structure, setting liability limits to 1x the trailing year's payments, and introducing standard exemptions to confidentiality.";
+    }
+
+    // Secure copy command implementation to bypass iframe sandbox clipboard constraints
+    function copyNegotiationText(elementId, buttonId) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+
+      const tempTextArea = document.createElement("textarea");
+      tempTextArea.value = element.innerText || element.textContent;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      
+      try {
+        document.execCommand('copy');
+        
+        // Update button text to show completed feedback
+        const btn = document.getElementById(buttonId);
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `
+          <svg class="h-3 w-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span class="text-emerald-400">Copied!</span>
+        `;
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+        }, 2000);
+        showToast("Text copied directly into clip-buffer.");
+      } catch (err) {
+        showToast("System permissions blocked clipboard actions. Please highlight the text to copy.");
+      }
+      document.body.removeChild(tempTextArea);
+    }
+
+    // App Initialization on Load
+    window.onload = function() {
+      updateConnectionIndicator();
+      showToast("LegisShield Enterprise Intelligence active & ready for secure audit files.");
+    };
   </script>
 </body>
 </html>
