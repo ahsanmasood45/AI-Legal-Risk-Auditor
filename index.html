@@ -779,6 +779,7 @@
 
     /**
      * Primary Audit Trigger: Routes extraction data directly to your Make.com Webhook
+     * Safely reads text-based response first to prevent "Unexpected token A" JSON parse crashes.
      */
     async function triggerAudit() {
       const isTextMode = activeInputTab === 'text';
@@ -826,10 +827,22 @@
           throw new Error(`Your Make.com Webhook returned status ${response.status}. Please check your Make scenario run logs.`);
         }
 
-        const responseData = await response.json();
-        
-        // Gracefully unpack payload if wrapped inside a results key or data key
-        const structuredResults = responseData.data || responseData;
+        // --- SAFE TEXT PARSING TO PREVENT CRASHES ---
+        const responseText = await response.text();
+        let structuredResults = null;
+
+        try {
+          const parsed = JSON.parse(responseText);
+          // Gracefully unpack payload if wrapped inside a results key or data key
+          structuredResults = parsed.data || parsed;
+        } catch (jsonErr) {
+          // If the raw response is exactly Make's default text, throw a highly specific, formatted error
+          if (responseText.trim() === "Accepted") {
+            throw new Error(`Your Make.com scenario received the contract, but replied with the default <strong>"Accepted"</strong> receipt instead of the analyzed data.<br><br><strong>Why this happens:</strong> This means your Make scenario ran, but **encountered an error or stopped** (likely in the Google Gemini step) before it could reach the <strong>Webhook Response</strong> module.<br><br><strong>How to fix:</strong><br>1. In Make.com, click on the <strong>History</strong> tab (or the clock icon) to see the execution log.<br>2. Look for any red warning/error icons on your Google Gemini module.<br>3. Ensure your Google Gemini module has a valid, active API connection/Key.`);
+          } else {
+            throw new Error(`The webhook returned an invalid JSON response structure:<br><br><code class="text-xs bg-slate-950 p-2 block border border-slate-800 text-rose-300 font-mono">${responseText.substring(0, 150)}...</code><br><br>Please verify your Webhook Response payload mapping.`);
+          }
+        }
 
         // Validate that returned data satisfies standard schema attributes
         if (!structuredResults.contractType || typeof structuredResults.overallRiskScore === 'undefined') {
