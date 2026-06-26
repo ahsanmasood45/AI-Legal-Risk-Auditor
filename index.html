@@ -96,7 +96,7 @@
 <body class="flex flex-col min-h-screen bg-[#050814] text-slate-100 antialiased">
 
   <!-- Premium Header -->
-  <header class="glass-panel sticky top-0 z-50 border-b border-slate-900 px-6 py-4 flex items-center justify-between">
+  <header class="glass-panel sticky top-0 z-40 border-b border-slate-900 px-6 py-4 flex items-center justify-between">
     <div class="flex items-center space-x-3.5">
       <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-xl shadow-indigo-500/10">
         <svg class="h-5.5 w-5.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +122,7 @@
   </header>
 
   <!-- Main Workspace -->
-  <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
     
     <!-- LEFT SIDE: Setup & Utilities (5 cols) -->
     <div class="lg:col-span-5 flex flex-col space-y-6">
@@ -236,7 +236,7 @@
           </svg>
         </div>
         <h3 class="text-xl font-bold text-white">System Awaiting Document</h3>
-        <p class="text-sm text-slate-400 max-w-sm mx-auto mt-2 leading-relaxed">
+        <p class="text-sm text-slate-400 max-sm mx-auto mt-2 leading-relaxed">
           Upload a legal agreement or execute a pre-loaded sandbox scenario to run structured risk audits instantly.
         </p>
         <button onclick="loadSample('nda')" class="mt-6 inline-flex items-center space-x-2 px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/10 transition">
@@ -262,7 +262,7 @@
           </div>
           <div class="flex items-center space-x-3 text-xs opacity-40" id="step-2">
             <span class="h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold">2</span>
-            <span class="text-slate-400">Make.com webhook workflow routing</span>
+            <span class="text-slate-400">Automated Webhook transmission routing</span>
           </div>
           <div class="flex items-center space-x-3 text-xs opacity-40" id="step-3">
             <span class="h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold">3</span>
@@ -482,7 +482,7 @@
               </div>
             </div>
 
-            <!-- Suggestion chips (value-add for prompt discovery) -->
+            <!-- Suggestion chips -->
             <div class="flex items-center space-x-2 overflow-x-auto pb-2 shrink-0 select-none scrollbar-none">
               <button onclick="injectPrompt('Is this contract unilateral or mutual?')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:bg-slate-900 hover:text-indigo-300 text-[10px] text-slate-400 font-medium transition-all">
                 ⚖️ Is this mutual?
@@ -602,6 +602,17 @@
     </div>
   </main>
 
+  <!-- Subtle Footer with Hidden Admin/Developer Trigger -->
+  <footer class="mt-auto py-4 border-t border-slate-900/60 text-center text-xs text-slate-500 flex items-center justify-between px-6 shrink-0">
+    <p>© 2026 LegisShield AI. All rights reserved.</p>
+    <button onclick="openAdminConsole()" class="text-slate-600 hover:text-indigo-400 transition flex items-center space-x-1">
+      <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+      </svg>
+      <span>Developer Console</span>
+    </button>
+  </footer>
+
   <!-- Notification Feed for actions inside sandbox -->
   <div id="notification-hub" class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
@@ -628,6 +639,46 @@
     </div>
   </div>
 
+  <!-- Developer Console Modal (Hidden by default, secure configuration hub) -->
+  <div id="admin-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl relative space-y-4">
+      <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
+        <div class="h-8 w-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+          <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+          </svg>
+        </div>
+        <h4 class="text-base font-bold text-white">Developer Configuration Panel</h4>
+      </div>
+      
+      <p class="text-xs text-slate-400">
+        Configure variables securely inside your browser's private local storage. These inputs will never be exposed to your end-users.
+      </p>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Make.com Webhook URL Override</label>
+          <input type="text" id="adminWebhookUrl" placeholder="https://hook.us2.make.com/..." class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 font-mono focus:border-indigo-500 outline-none">
+          <p class="text-[9px] text-slate-500 mt-1">Leave blank to use default hardcoded Make.com webhook.</p>
+        </div>
+        <div>
+          <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Optional Gemini API Key (Direct Fallback)</label>
+          <input type="password" id="adminApiKey" placeholder="AIzaSy..." class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 font-mono focus:border-indigo-500 outline-none">
+          <p class="text-[9px] text-slate-500 mt-1">Saves in browser memory to enable direct client-side auditing if your Make pipeline is offline.</p>
+        </div>
+      </div>
+
+      <div class="mt-6 flex space-x-3">
+        <button onclick="closeAdminConsole()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2 px-4 rounded-xl text-xs transition border border-slate-750">
+          Cancel
+        </button>
+        <button onclick="saveAdminConfigurations()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-xl text-xs transition">
+          Save Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- JS Logic -->
   <script>
     // Initialize PDF.js worker
@@ -644,7 +695,7 @@
     const apiKey = ""; // Runtime automatically provisions this key
     const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
 
-    // Hardcoded Webhook URL
+    // Default Hardcoded Webhook URL
     const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/2zll771322nbbw6xrb18t54xc5e23yx2";
 
     // High fidelity sample data representing robust audits
@@ -846,11 +897,28 @@
     };
 
     /**
+     * Retrieves the active Webhook URL (checks localStorage override, falls back to hardcoded production value)
+     */
+    function getActiveWebhookUrl() {
+      const customUrl = localStorage.getItem('legisshield_webhook_url');
+      return (customUrl && customUrl.trim().length > 10) ? customUrl.trim() : MAKE_WEBHOOK_URL;
+    }
+
+    /**
+     * Retrieves the active Gemini API Key (checks localStorage override, falls back to default runtime variable)
+     */
+    function getActiveApiKey() {
+      const customKey = localStorage.getItem('legisshield_api_key');
+      return (customKey && customKey.trim().length > 10) ? customKey.trim() : apiKey;
+    }
+
+    /**
      * Browser-side Fetch Client equipped with strict exponential backoff algorithm
      * Retries up to 5 times (1s, 2s, 4s, 8s, 16s delays) on timeouts or transient codes.
      */
     async function makeGeminiApiCall(payload) {
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+      const activeKey = getActiveApiKey();
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${activeKey}`;
       const retryDelays = [1000, 2000, 4000, 8000, 16000];
       
       for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
@@ -872,7 +940,6 @@
           if (attempt === retryDelays.length) {
             throw new Error(`Connection failed after ${attempt + 1} retries: ${error.message}`);
           }
-          // Silent delay - wait specified delay before executing retry loop
           await new Promise(resolve => setTimeout(resolve, retryDelays[attempt]));
         }
       }
@@ -1182,8 +1249,10 @@ Be highly objective, analytical, and precise. Every identified risk must have an
         // Make sure loading panel is open
         if (isTextMode) showLoadingScreen();
 
+        const webhookEndpoint = getActiveWebhookUrl();
+        
         // Call the Make Webhook using the secure, background, hardcoded constant
-        const response = await fetch(MAKE_WEBHOOK_URL, {
+        const response = await fetch(webhookEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1701,6 +1770,38 @@ Be highly objective, analytical, and precise. Every identified risk must have an
       const input = document.getElementById('chat-input');
       input.value = text;
       input.focus();
+    }
+
+    // Toggle Developer Console Dialog Modal
+    function openAdminConsole() {
+      // Pre-populate input values from local storage
+      document.getElementById('adminWebhookUrl').value = localStorage.getItem('legisshield_webhook_url') || "";
+      document.getElementById('adminApiKey').value = localStorage.getItem('legisshield_api_key') || "";
+      document.getElementById('admin-modal').classList.remove('hidden');
+    }
+
+    function closeAdminConsole() {
+      document.getElementById('admin-modal').classList.add('hidden');
+    }
+
+    function saveAdminConfigurations() {
+      const customUrl = document.getElementById('adminWebhookUrl').value.trim();
+      const customKey = document.getElementById('adminApiKey').value.trim();
+      
+      if (customUrl) {
+        localStorage.setItem('legisshield_webhook_url', customUrl);
+      } else {
+        localStorage.removeItem('legisshield_webhook_url');
+      }
+
+      if (customKey) {
+        localStorage.setItem('legisshield_api_key', customKey);
+      } else {
+        localStorage.removeItem('legisshield_api_key');
+      }
+
+      closeAdminConsole();
+      showToast("Configurations successfully saved!");
     }
   </script>
 </body>
