@@ -421,9 +421,9 @@
                   <span class="text-[10px] uppercase font-bold text-indigo-300 tracking-wider">Strategic Posture</span>
                   <p id="brief-posture" class="text-xs text-slate-200 mt-1.5 leading-relaxed"></p>
                 </div>
-                <div class="p-3.5 bg-cyan-950/20 rounded-xl border border-cyan-500/10 flex flex-col justify-between">
+                <div class="p-3.5 bg-cyan-950/20 rounded-lg border border-cyan-500/10 flex flex-col justify-between">
                   <div>
-                    <span class="text-[10px] uppercase font-bold text-cyan-300 tracking-wider block">Bargaining Leverage Rating</span>
+                    <span class="text-[10px] uppercase font-bold text-cyan-300 block">Overall Deal Leverage</span>
                     <span id="brief-leverage-rating" class="text-xs font-bold text-slate-200 mt-1.5 block">Analyzing...</span>
                   </div>
                   <div class="h-1.5 w-full bg-slate-950 rounded-full overflow-hidden mt-2">
@@ -518,7 +518,7 @@
                 <h4 class="text-sm font-bold text-white">✨ Regulatory Compliance Scanner</h4>
                 <p class="text-[11px] text-slate-400">Deep check against global ISO 27001, SOC2, GDPR, and data protection rules.</p>
               </div>
-              <button onclick="auditRegulatoryCompliance()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold text-white transition flex items-center space-x-1 shadow-md">
+              <button onclick="auditRegulatoryCompliance()" class="px-3 py-1.5 bg-indigo-650 hover:bg-indigo-600 rounded-lg text-xs font-semibold text-white transition flex items-center space-x-1 shadow-md">
                 <span>✨ Run Compliance Scan</span>
               </button>
             </div>
@@ -625,9 +625,9 @@
         </svg>
       </div>
       <h4 class="text-lg font-bold text-white" id="modal-title">API Execution Warning</h4>
-      <p class="text-sm text-slate-400 mt-2 leading-relaxed" id="modal-description">
+      <div id="modal-description" class="text-sm text-slate-400 mt-2 leading-relaxed">
         Something went wrong.
-      </p>
+      </div>
       <div class="mt-6 flex space-x-3">
         <button onclick="closeModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2 px-4 rounded-xl text-xs transition border border-slate-750">
           Acknowledge
@@ -918,6 +918,9 @@
      */
     async function makeGeminiApiCall(payload) {
       const activeKey = getActiveApiKey();
+      if (!activeKey || activeKey.trim() === "") {
+        throw new Error("Gemini API Key is not configured. Please open the 'Developer Console' in the footer to save your API Key for direct browser-side analysis.");
+      }
       const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${activeKey}`;
       const retryDelays = [1000, 2000, 4000, 8000, 16000];
       
@@ -1305,14 +1308,35 @@ Be highly objective, analytical, and precise. Every identified risk must have an
           document.getElementById('state-loading').classList.add('hidden');
           document.getElementById('state-empty').classList.remove('hidden');
 
+          let detailedMessage = fallbackError.message;
+          let modalHTMLContent = "";
+
+          // Provide clean instructions on how to resolve API Key permissions and webhook Accepted mismatches
+          if (detailedMessage.includes("Gemini API Key is not configured") || detailedMessage.includes("403") || detailedMessage.includes("unregistered callers")) {
+            modalHTMLContent = `
+              Your Make.com pipeline did not return a valid audit report (it returned "Accepted" or failed to connect).
+              <br><br>
+              LegisShield attempted to fall back to a direct client-side audit, but was rejected because <strong>no Gemini API Key is configured</strong>.
+              <br><br>
+              <strong>How to resolve:</strong>
+              <ol class="list-decimal pl-4 mt-2 space-y-1.5 text-xs text-slate-350">
+                <li>Click the <strong>Developer Console</strong> button in the footer below.</li>
+                <li>Enter your personal <strong>Gemini API Key</strong> and click Save.</li>
+                <li>Alternatively, ensure your Make.com workflow concludes with a <strong>Webhook Response</strong> module that returns the Gemini JSON.</li>
+              </ol>
+            `;
+          } else {
+            modalHTMLContent = `
+              An error occurred while executing your automated contract pipeline.
+              <br><br>
+              <span class="text-xs text-rose-300 font-mono bg-slate-950/80 p-2 rounded block border border-slate-900">${detailedMessage}</span>
+              <br><br>
+              Ensure your network is active, or use our pre-analyzed demo simulations to test out the visual features.
+            `;
+          }
+
           document.getElementById('modal-title').textContent = "Pipeline Integration Warning";
-          document.getElementById('modal-description').innerHTML = `
-            An error occurred while calling your custom Make.com pipeline.
-            <br><br>
-            <span class="text-xs text-rose-300">Technical Details: ${error.message}</span>
-            <br><br>
-            You can continue evaluating design layouts using pre-analyzed dry runs in the safe sandbox below.
-          `;
+          document.getElementById('modal-description').innerHTML = modalHTMLContent;
           document.getElementById('custom-modal').classList.remove('hidden');
         }
       }
@@ -1328,481 +1352,158 @@ Be highly objective, analytical, and precise. Every identified risk must have an
     }
 
     /**
-     * Plain English Legal Jargon explainer
+     * Dynamically renders JSON structured outputs into visual cards
      */
-    async function translateLegaleseToPlainEnglish() {
-      const legaleseText = document.getElementById('legaleseInput').value.trim();
-      if (!legaleseText) {
-        showNotification("Please paste complex contract legalese first.", "warning");
-        return;
-      }
-
-      const explanationDiv = document.getElementById('trap-explanation');
-      explanationDiv.classList.remove('hidden');
-      explanationDiv.innerHTML = "Decoding legalese parameters under direct Gemini 2.5 instructions...";
-
-      const systemInstructionPrompt = "You are a pragmatic, direct Chief of Staff who hates legal jargon. Translate the provided legal clause into plain, understandable terms like you are explaining it to a teenager. Focus specifically on explaining where the hidden trap or risk is for the business.";
-
-      try {
-        const payload = {
-          contents: [{ parts: [{ text: legaleseText }] }],
-          systemInstruction: { parts: [{ text: systemInstructionPrompt }] },
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 500
-          }
-        };
-
-        const result = await makeGeminiApiCall(payload);
-        const explanationText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-        
-        if (!explanationText) throw new Error("Empty explanatory response returned from Gemini.");
-        explanationDiv.innerHTML = explanationText;
-        showToast("Legalese successfully decoded!");
-
-      } catch (err) {
-        explanationDiv.innerHTML = `<span class="text-rose-455 font-semibold">Failed to explain legalese clause: ${err.message}</span>`;
-      }
-    }
-
-    /**
-     * Direct Compliance scan query & UI population
-     */
-    async function auditRegulatoryCompliance() {
-      if (!extractedTextContent) {
-        showNotification("Please upload or load a sample contract to scan.", "warning");
-        return;
-      }
-
-      document.getElementById('compliance-placeholder').classList.add('hidden');
-      document.getElementById('compliance-content').classList.add('hidden');
-      const loader = document.getElementById('compliance-loading');
-      loader.classList.remove('hidden');
-
-      const COMPLIANCE_SCHEMA = {
-        type: "OBJECT",
-        properties: {
-          gdprStatus: { type: "STRING" }, // PASS, WARNING, FAIL
-          gdprExplanation: { type: "STRING" },
-          securityStatus: { type: "STRING" }, // PASS, WARNING, FAIL
-          securityExplanation: { type: "STRING" },
-          liabilityCapStatus: { type: "STRING" }, // PASS, WARNING, FAIL
-          liabilityCapExplanation: { type: "STRING" }
-        },
-        required: ["gdprStatus", "gdprExplanation", "securityStatus", "securityExplanation", "liabilityCapStatus", "liabilityCapExplanation"]
-      };
-
-      const auditPrompt = `Assess this contract against ISO 27001 / SOC2 Security controls, GDPR Data Protection, and commercial Liability Exposure requirements:
-      ---
-      ${extractedTextContent.substring(0, 30000)}
-      ---`;
-
-      try {
-        const payload = {
-          contents: [{ parts: [{ text: auditPrompt }] }],
-          systemInstruction: { parts: [{ text: "You are a chief information security officer (CISO) and dynamic privacy officer. Evaluate if data transfers, security breach protocols, and liability limits comply with GDPR, ISO 27001, and SOC2 regulations." }] },
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: COMPLIANCE_SCHEMA,
-            temperature: 0.15
-          }
-        };
-
-        const result = await makeGeminiApiCall(payload);
-        const textResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!textResponse) throw new Error("No compliance analysis payload generated.");
-
-        const compData = JSON.parse(textResponse);
-        renderComplianceResults(compData);
-
-        loader.classList.add('hidden');
-        document.getElementById('compliance-content').classList.remove('hidden');
-        showToast("Grounded Regulatory Scan Complete!");
-
-      } catch (err) {
-        loader.classList.add('hidden');
-        document.getElementById('compliance-placeholder').classList.remove('hidden');
-        showNotification("Failed to execute compliance audit: " + err.message, "error");
-      }
-    }
-
-    function renderComplianceResults(compData) {
-      // GDPR Section
-      const gdprBadge = document.getElementById('gdpr-status-badge');
-      gdprBadge.textContent = compData.gdprStatus;
-      gdprBadge.className = getComplianceBadgeStyle(compData.gdprStatus);
-      document.getElementById('gdpr-explanation').textContent = compData.gdprExplanation;
-
-      // Security Section
-      const secBadge = document.getElementById('security-status-badge');
-      secBadge.textContent = compData.securityStatus;
-      secBadge.className = getComplianceBadgeStyle(compData.securityStatus);
-      document.getElementById('security-explanation').textContent = compData.securityExplanation;
-
-      // Liability Cap Section
-      const liBadge = document.getElementById('liability-status-badge');
-      liBadge.textContent = compData.liabilityCapStatus;
-      liBadge.className = getComplianceBadgeStyle(compData.liabilityCapStatus);
-      document.getElementById('liability-explanation').textContent = compData.liabilityCapExplanation;
-    }
-
-    function getComplianceBadgeStyle(status) {
-      if (status === 'PASS') return "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-      if (status === 'WARNING') return "px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20";
-      return "px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20";
-    }
-
-    /**
-     * Presentation slide drafting
-     */
-    async function generateBoardPresentation() {
-      if (!extractedTextContent) {
-        showNotification("Please upload or load a sample contract to scan.", "warning");
-        return;
-      }
-
-      document.getElementById('board-placeholder').classList.add('hidden');
-      document.getElementById('board-content').classList.add('hidden');
-      const loader = document.getElementById('board-loading');
-      loader.classList.remove('hidden');
-
-      const BOARD_SCHEMA = {
-        type: "OBJECT",
-        properties: {
-          slides: {
-            type: "ARRAY",
-            items: {
-              type: "OBJECT",
-              properties: {
-                slideNumber: { type: "INTEGER" },
-                title: { type: "STRING" },
-                bullets: {
-                  type: "ARRAY",
-                  items: { type: "STRING" }
-                }
-              },
-              required: ["slideNumber", "title", "bullets"]
-            }
-          }
-        },
-        required: ["slides"]
-      };
-
-      const deckPrompt = `Act as an elite strategic consultant preparing a C-Suite executive briefing deck about the following contract text:
-      ---
-      ${extractedTextContent.substring(0, 30000)}
-      ---
+    function renderResults(data) {
+      auditReportData = data; // Keep tracking
       
-      Generate exactly 3 structured slide drafts:
-      Slide 1: Transaction Overview & Bottom-Line Verdict (Sign, Kill, or Renegotiate)
-      Slide 2: Top 3 Critical Liability Vectors Found
-      Slide 3: Strategic Counter-Proposal Plan & Negotiation Safe Harbors`;
+      // Stop Loading Screen
+      document.getElementById('state-loading').classList.add('hidden');
+      document.getElementById('state-results').classList.remove('hidden');
 
-      try {
-        const payload = {
-          contents: [{ parts: [{ text: deckPrompt }] }],
-          systemInstruction: { parts: [{ text: "You draft elite, punchy, bulleted executive presentations. Avoid verbose narrative text. Keep items sharp and concise." }] },
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: BOARD_SCHEMA,
-            temperature: 0.2
-          }
-        };
+      // Set Metadata values
+      document.getElementById('res-contractType').textContent = data.contractType;
+      document.getElementById('res-summary').textContent = data.summary;
+      document.getElementById('badge-count-risks').textContent = data.risks.length;
+      document.getElementById('badge-count-missing').textContent = data.missingClauses.length;
 
-        const result = await makeGeminiApiCall(payload);
-        const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!jsonText) throw new Error("No briefing deck payload generated.");
+      // Populate deal matrix metrics
+      document.getElementById('metric-liability').textContent = data.liabilityProfile || "Unspecified";
+      document.getElementById('bar-liability').style.width = `${data.liabilityValue || 50}%`;
+      
+      document.getElementById('metric-ip').textContent = data.ipSafety || "Asymmetric";
+      document.getElementById('bar-ip').style.width = `${data.ipValue || 50}%`;
+      
+      document.getElementById('metric-jurisdiction').textContent = data.disputeProfile || "Unfavorable Venue";
+      document.getElementById('bar-jurisdiction').style.width = `${data.disputeValue || 50}%`;
 
-        const parsedData = JSON.parse(jsonText);
-        renderSlidesResults(parsedData.slides);
+      // Render score ring & text
+      const score = data.overallRiskScore;
+      document.getElementById('score-text').textContent = score;
+      
+      const offset = 251.2 - (251.2 * score) / 100;
+      const scoreRing = document.getElementById('score-ring');
+      scoreRing.style.strokeDashoffset = offset;
 
-        loader.classList.add('hidden');
-        document.getElementById('board-content').classList.remove('hidden');
-        showToast("Executive Briefing Deck created!");
-
-      } catch (err) {
-        loader.classList.add('hidden');
-        document.getElementById('board-placeholder').classList.remove('hidden');
-        showNotification("Failed to generate slide deck: " + err.message, "error");
+      // Handle Category tag color
+      const badge = document.getElementById('risk-badge');
+      badge.textContent = `${data.riskTier} (${score}/100)`;
+      
+      if (score >= 70) {
+        badge.className = "mt-4 px-3 py-1.5 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20";
+        scoreRing.setAttribute('stroke', '#ef4444');
+      } else if (score >= 40) {
+        badge.className = "mt-4 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20";
+        scoreRing.setAttribute('stroke', '#f59e0b');
+      } else {
+        badge.className = "mt-4 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+        scoreRing.setAttribute('stroke', '#10b981');
       }
+
+      // Populate Explicit Risks Matrix
+      populateRisks(data.risks);
+
+      // Populate Missing Clauses Table
+      populateMissing(data.missingClauses);
+
+      // Default back to explicit risks panel tab view
+      switchResultSubtab('risks');
     }
 
-    function renderSlidesResults(slidesArray) {
-      const boardContent = document.getElementById('board-content');
-      boardContent.innerHTML = ""; // Clear prior slides
+    function populateRisks(risksListArray) {
+      const container = document.getElementById('risks-list');
+      container.innerHTML = '';
 
-      slidesArray.forEach(slide => {
-        const slideCard = document.createElement('div');
-        slideCard.className = "p-5 bg-slate-900/60 border border-slate-800 rounded-xl space-y-3 relative mb-4";
-        
-        let bulletsList = "";
-        slide.bullets.forEach(bullet => {
-          bulletsList += `<li class="text-xs text-slate-300 leading-relaxed pl-1">${bullet}</li>`;
-        });
-
-        slideCard.innerHTML = `
-          <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
-            <span class="text-[10px] uppercase font-bold text-cyan-400">BOARD SLIDE ${slide.slideNumber} OF 3</span>
+      if (risksListArray.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 bg-slate-900/30 rounded-xl border border-slate-800">
+            <p class="text-xs text-slate-500">No explicit contract risks detected.</p>
           </div>
-          <h5 class="text-sm font-bold text-white">${slide.title}</h5>
-          <ul class="list-disc list-inside space-y-2 pl-1">
-            ${bulletsList}
-          </ul>
         `;
-        boardContent.appendChild(slideCard);
+        return;
+      }
+
+      risksListArray.forEach((r, index) => {
+        const severityClass = getSeverityTagStyle(r.severity);
+        
+        const card = document.createElement('div');
+        card.className = "glass-panel rounded-xl p-5 border border-slate-800 space-y-4 shadow-md relative overflow-hidden group";
+        card.setAttribute('data-severity', r.severity);
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between space-x-4">
+            <div class="space-y-1">
+              <span class="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded ${severityClass}">
+                ${r.severity} Risk Severity
+              </span>
+              <h4 class="text-sm font-bold text-white mt-1.5 group-hover:text-indigo-300 transition-colors">${r.clauseName}</h4>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">Business Liability Risk</span>
+            <p class="text-xs text-slate-300 leading-relaxed">${r.impact}</p>
+          </div>
+
+          <!-- SPLIT PANE CONTRACT REDLINER VIEW -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 border-t border-slate-800/80">
+            <!-- Original Excerpt (Left) -->
+            <div class="bg-rose-950/10 border border-rose-500/10 rounded-lg p-3 relative flex flex-col justify-between">
+              <div>
+                <span class="text-[9px] uppercase tracking-wider text-rose-400 font-bold block mb-1">Verbatim Contract Clause Excerpt</span>
+                <p class="text-xs text-slate-400 font-mono leading-relaxed">"${r.excerpt}"</p>
+              </div>
+            </div>
+            <!-- Redline Proposal (Right) -->
+            <div class="bg-emerald-950/10 border border-emerald-500/10 rounded-lg p-3 relative flex flex-col justify-between">
+              <div>
+                <span class="text-[9px] uppercase tracking-wider text-emerald-400 font-bold block mb-1">Proposed Redline Rewrite</span>
+                <p class="text-xs text-slate-200 font-mono leading-relaxed select-all" id="redline-text-${index}">${r.mitigation}</p>
+              </div>
+              <div class="flex justify-end mt-2">
+                <button id="btn-copy-redline-${index}" onclick="copyNegotiationText('redline-text-${index}', 'btn-copy-redline-${index}')" class="text-slate-500 hover:text-white transition flex items-center space-x-1 text-[9px] bg-slate-900/60 border border-slate-800 px-2 py-1 rounded" title="Copy redline proposal">
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                  </svg>
+                  <span class="btn-text">Copy Proposal</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
       });
     }
 
-    /**
-     * Strategic Posture and Brief calculations
-     */
-    function renderBriefResults(negotiationData) {
-      document.getElementById('brief-posture').textContent = negotiationData.strategicPosture;
-      document.getElementById('brief-leverage-rating').textContent = negotiationData.leverageRating;
-      document.getElementById('brief-leverage-bar').style.width = `${negotiationData.leverageScore}%`;
-      
-      const leverageContainer = document.getElementById('brief-leverage-container');
-      leverageContainer.innerHTML = "";
-      negotiationData.leveragePoints.forEach(point => {
-        const item = document.createElement('div');
-        item.className = "p-3.5 bg-slate-900/60 rounded-xl border border-slate-800 flex items-start space-x-3";
-        item.innerHTML = `
-          <span class="h-5 w-5 rounded-full flex items-center justify-center bg-indigo-500/10 text-indigo-400 font-bold text-xs shrink-0 mt-0.5">✓</span>
+    function populateMissing(missingListArray) {
+      const container = document.getElementById('missing-list');
+      container.innerHTML = '';
+
+      if (missingListArray.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 bg-slate-900/30 rounded-xl border border-slate-800">
+            <p class="text-xs text-slate-500">All standard commercial legal protections seem present.</p>
+          </div>
+        `;
+        return;
+      }
+
+      missingListArray.forEach((m, index) => {
+        const card = document.createElement('div');
+        card.className = "glass-panel rounded-xl p-5 border border-slate-800 space-y-3 shadow-md relative";
+        
+        card.innerHTML = `
           <div>
-            <h5 class="text-xs font-bold text-white">${point.pointTitle}</h5>
-            <p class="text-[11px] text-slate-300 leading-relaxed mt-0.5">${point.pointAction}</p>
+            <span class="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">
+              Absent Safeguard Protection
+            </span>
+            <h4 class="text-sm font-bold text-white mt-2">${m.clauseName}</h4>
           </div>
-        `;
-        leverageContainer.appendChild(item);
-      });
-
-      document.getElementById('brief-email').textContent = negotiationData.emailDraft;
-      document.getElementById('brief-placeholder').classList.add('hidden');
-      document.getElementById('brief-content').classList.remove('hidden');
-    }
-
-    /**
-     * Interactive copilot chat queries
-     */
-    async function sendChatMessage() {
-      const inputEl = document.getElementById('chat-input');
-      const queryText = inputEl.value.trim();
-      if (!queryText) return;
-
-      if (!extractedTextContent) {
-        showNotification("Please upload or load a sample contract to interrogate.", "warning");
-        return;
-      }
-
-      // Append user bubble to UI
-      const stream = document.getElementById('chat-messages');
-      const userBubble = document.createElement('div');
-      userBubble.className = "flex items-start justify-end space-x-2.5";
-      userBubble.innerHTML = `
-        <div class="bg-indigo-650 rounded-xl p-3 text-xs text-white leading-relaxed max-w-[85%] select-text shadow">
-          ${queryText}
-        </div>
-        <div class="h-7 w-7 rounded-lg bg-indigo-500 text-slate-950 flex items-center justify-center text-xs font-bold shrink-0">
-          ME
-        </div>
-      `;
-      stream.appendChild(userBubble);
-      stream.scrollTop = stream.scrollHeight;
-      inputEl.value = "";
-
-      // Loading typing indicator
-      const loaderBubble = document.createElement('div');
-      loaderBubble.id = "chat-typing-indicator";
-      loaderBubble.className = "flex items-start space-x-2.5";
-      loaderBubble.innerHTML = `
-        <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
-        <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-400 max-w-[85%] flex items-center space-x-2">
-          <span class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
-          <span class="h-2 w-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:0.2s]"></span>
-          <span class="h-2 w-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:0.4s]"></span>
-        </div>
-      `;
-      stream.appendChild(loaderBubble);
-      stream.scrollTop = stream.scrollHeight;
-
-      // Build context payload for Copilot
-      const copilotPrompt = `You are the ultimate commercial legal advisor. You are answering queries about this contract text:
-      ---
-      ${extractedTextContent.substring(0, 40000)}
-      ---
-      
-      The analyzed risk layout is:
-      ${JSON.stringify(auditReportData)}
-
-      User Query: "${queryText}"
-
-      Formulate a precise, clear, and highly practical reply. If asked to draft revisions, provide modular, plug-and-play boilerplate terms that are balanced and fair for the project manager. Limit answer to 1-3 short paragraphs maximum.`;
-
-      try {
-        const payload = {
-          contents: [{ parts: [{ text: copilotPrompt }] }],
-          systemInstruction: { parts: [{ text: "You are an elite legal contract copilot. Answer concisely, precisely, and commercially." }] },
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 800
-          }
-        };
-
-        const result = await makeGeminiApiCall(payload);
-        const rawResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        // Remove typing indicator
-        const typingIndicator = document.getElementById('chat-typing-indicator');
-        if (typingIndicator) stream.removeChild(typingIndicator);
-
-        if (!rawResponse) throw new Error("Copilot returned an empty response candidate.");
-
-        // Append response bubble
-        const aiBubble = document.createElement('div');
-        aiBubble.className = "flex items-start space-x-2.5";
-        aiBubble.innerHTML = `
-          <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
-          <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-200 leading-relaxed max-w-[85%] whitespace-pre-wrap select-text shadow-sm">
-            ${rawResponse}
-          </div>
-        `;
-        stream.appendChild(aiBubble);
-        stream.scrollTop = stream.scrollHeight;
-
-      } catch (err) {
-        const typingIndicator = document.getElementById('chat-typing-indicator');
-        if (typingIndicator) stream.removeChild(typingIndicator);
-
-        const aiBubble = document.createElement('div');
-        aiBubble.className = "flex items-start space-x-2.5";
-        aiBubble.innerHTML = `
-          <div class="h-7 w-7 rounded-lg bg-rose-950/40 border border-rose-500/20 text-rose-400 flex items-center justify-center text-xs font-bold shrink-0">ERR</div>
-          <div class="bg-rose-950/20 rounded-xl p-3 border border-rose-900/30 text-xs text-rose-300 leading-relaxed max-w-[85%]">
-            Apologies, I encountered an error answering that question. Technical reasons: ${err.message}
-          </div>
-        `;
-        stream.appendChild(aiBubble);
-        stream.scrollTop = stream.scrollHeight;
-      }
-    }
-
-    function handleChatKeyDown(e) {
-      if (e.key === 'Enter') {
-        sendChatMessage();
-      }
-    }
-
-    /**
-     * Copy actions helper
-     */
-    function copyNegotiationText(elementId, btnId) {
-      const textToCopy = document.getElementById(elementId).innerText || document.getElementById(elementId).textContent;
-      const button = document.getElementById(btnId);
-      const originalHtml = button.innerHTML;
-      
-      const tempTextArea = document.createElement('textarea');
-      tempTextArea.value = textToCopy;
-      document.body.appendChild(tempTextArea);
-      tempTextArea.select();
-      
-      try {
-        const success = document.execCommand('copy');
-        if (success) {
-          showNotification("Text copied to clipboard!", "success");
           
-          const btnTextSpan = button.querySelector('.btn-text');
-          if (btnTextSpan) {
-            btnTextSpan.textContent = "Copied!";
-            button.classList.add('text-emerald-400', 'border-emerald-500/20', 'bg-emerald-950/20');
-            setTimeout(() => {
-              button.innerHTML = originalHtml;
-              button.classList.remove('text-emerald-400', 'border-emerald-500/20', 'bg-emerald-950/20');
-            }, 1800);
-          }
-        } else {
-          showNotification("Unable to copy automatically.", "error");
-        }
-      } catch (err) {
-        showNotification("Failed to copy snippet.", "error");
-      }
-      
-      document.body.removeChild(tempTextArea);
-    }
+          <div class="space-y-2">
+            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">Why It Matters</span>
+            <p class="text-xs text-slate-300 leading-relaxed">${m.importance}</p>
+          </div>
 
-    /**
-     * Elegant Non-intrusive alert notification alerts
-     */
-    function showNotification(msg, type = 'success') {
-      const hub = document.getElementById('notification-hub');
-      const item = document.createElement('div');
-      
-      let borderClass = 'border-slate-800 bg-slate-900/90 text-slate-100';
-      if (type === 'warning') borderClass = 'border-amber-500/20 bg-amber-950/80 text-amber-300';
-      if (type === 'error') borderClass = 'border-rose-500/20 bg-rose-950/80 text-rose-300';
-      if (type === 'info') borderClass = 'border-indigo-500/20 bg-indigo-950/80 text-indigo-300';
-
-      item.className = `flex items-center space-x-2 px-4 py-3 rounded-xl border text-xs shadow-xl transition-all duration-300 transform translate-y-4 opacity-0 ${borderClass}`;
-      item.innerHTML = `
-        <span>${msg}</span>
-      `;
-      
-      hub.appendChild(item);
-      
-      // Animate entry
-      setTimeout(() => {
-        item.classList.remove('translate-y-4', 'opacity-0');
-      }, 50);
-
-      // Dismiss timer
-      setTimeout(() => {
-        item.classList.add('opacity-0', 'translate-y--4');
-        setTimeout(() => {
-          hub.removeChild(item);
-        }, 300);
-      }, 3000);
-    }
-
-    function showToast(msg) {
-      showNotification(msg, 'success');
-    }
-
-    function injectPrompt(text) {
-      const input = document.getElementById('chat-input');
-      input.value = text;
-      input.focus();
-    }
-
-    // Toggle Developer Console Dialog Modal
-    function openAdminConsole() {
-      // Pre-populate input values from local storage
-      document.getElementById('adminWebhookUrl').value = localStorage.getItem('legisshield_webhook_url') || "";
-      document.getElementById('adminApiKey').value = localStorage.getItem('legisshield_api_key') || "";
-      document.getElementById('admin-modal').classList.remove('hidden');
-    }
-
-    function closeAdminConsole() {
-      document.getElementById('admin-modal').classList.add('hidden');
-    }
-
-    function saveAdminConfigurations() {
-      const customUrl = document.getElementById('adminWebhookUrl').value.trim();
-      const customKey = document.getElementById('adminApiKey').value.trim();
-      
-      if (customUrl) {
-        localStorage.setItem('legisshield_webhook_url', customUrl);
-      } else {
-        localStorage.removeItem('legisshield_webhook_url');
-      }
-
-      if (customKey) {
-        localStorage.setItem('legisshield_api_key', customKey);
-      } else {
-        localStorage.removeItem('legisshield_api_key');
-      }
-
-      closeAdminConsole();
-      showToast("Configurations successfully saved!");
-    }
-  </script>
-</body>
-</html>
+          <div class="bg-slate-950/40 rounded-lg p-3.5 border border-indigo-500/10 relative">
+            <span class="text-[10px] uppercase tracking-wider text-indigo
