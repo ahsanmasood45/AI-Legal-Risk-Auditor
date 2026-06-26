@@ -721,22 +721,26 @@
       setTimeout(() => {
         const data = SAMPLE_NDAS[type];
         extractedTextContent = data.rawText;
-        
-        // Reset subpanels when switching contracts
-        document.getElementById('brief-placeholder').classList.remove('hidden');
-        document.getElementById('brief-content').classList.add('hidden');
-        document.getElementById('chat-messages').innerHTML = `
-          <div class="flex items-start space-x-2.5">
-            <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
-            <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-200 leading-relaxed max-w-[85%]">
-              Greetings, Negotiator. I am grounded in your ${data.contractType} specifications. Ask me to modify any clause or check liabilities.
-            </div>
-          </div>
-        `;
-
+        resetSecondaryPanels(data.contractType);
         renderResults(data);
         showToast(`Loaded ${data.contractType} Simulation Model`);
       }, 1500);
+    }
+
+    /**
+     * Resets subtab panels with appropriate dynamic context
+     */
+    function resetSecondaryPanels(contractType) {
+      document.getElementById('brief-placeholder').classList.remove('hidden');
+      document.getElementById('brief-content').classList.add('hidden');
+      document.getElementById('chat-messages').innerHTML = `
+        <div class="flex items-start space-x-2.5">
+          <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
+          <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-200 leading-relaxed max-w-[85%]">
+            Greetings, Negotiator. I am grounded in your ${contractType} specifications. Ask me to modify any clause or check liabilities.
+          </div>
+        </div>
+      `;
     }
 
     /**
@@ -778,8 +782,74 @@
     }
 
     /**
+     * Performs a direct serverless browser-side audit on Gemini
+     * Used when Make.com is offline, missing response modules, or returning plain "Accepted".
+     */
+    async function runClientSideAudit(contractText) {
+      const SYSTEM_PROMPT = `You are an elite, corporate General Counsel and Risk Mitigation Architect specializing in business contracts.
+Your objective is to analyze the provided contract text and extract high-friction liabilities, unfavorable terms, and critical missing clauses.
+Be highly objective, analytical, and precise. Every identified risk must have an exact excerpt from the text as proof, followed by an explanation of how it impacts the business, and a ready-to-use redline rewrite/mitigation strategy. Output must fit the requested JSON schema structure exactly.`;
+
+      const AUDIT_RESPONSE_SCHEMA = {
+        type: "OBJECT",
+        properties: {
+          contractType: { type: "STRING" },
+          overallRiskScore: { type: "INTEGER" },
+          riskTier: { type: "STRING" },
+          summary: { type: "STRING" },
+          risks: {
+            type: "ARRAY",
+            items: {
+              type: "OBJECT",
+              properties: {
+                clauseName: { type: "STRING" },
+                severity: { type: "STRING" },
+                excerpt: { type: "STRING" },
+                impact: { type: "STRING" },
+                mitigation: { type: "STRING" }
+              },
+              required: ["clauseName", "severity", "excerpt", "impact", "mitigation"]
+            }
+          },
+          missingClauses: {
+            type: "ARRAY",
+            items: {
+              type: "OBJECT",
+              properties: {
+                clauseName: { type: "STRING" },
+                importance: { type: "STRING" },
+                recommendedLanguage: { type: "STRING" }
+              },
+              required: ["clauseName", "importance", "recommendedLanguage"]
+            }
+          }
+        },
+        required: ["contractType", "overallRiskScore", "riskTier", "summary", "risks", "missingClauses"]
+      };
+
+      const payload = {
+        contents: [{ parts: [{ text: `Evaluate this legal document text for risk and liabilities: \n\n${contractText.substring(0, 40000)}` }] }],
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: AUDIT_RESPONSE_SCHEMA,
+          temperature: 0.15
+        }
+      };
+
+      const responseData = await makeGeminiApiCall(payload);
+      const candidateText = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!candidateText) {
+        throw new Error("The Gemini model generated an empty response content structural payload.");
+      }
+
+      return JSON.parse(candidateText);
+    }
+
+    /**
      * Primary Audit Trigger: Routes extraction data directly to your Make.com Webhook
-     * Safely reads text-based response first to prevent "Unexpected token A" JSON parse crashes.
+     * Equipped with an automatic client-side backup logic if Make.com returns "Accepted".
      */
     async function triggerAudit() {
       const isTextMode = activeInputTab === 'text';
@@ -808,8 +878,15 @@
         if (isTextMode) showLoadingScreen();
 
         const webhookEndpoint = document.getElementById('webhookUrl').value.trim();
-        if (!webhookEndpoint) {
-          throw new Error("No Make.com Webhook URL has been configured in your settings panel.");
+        
+        // If they did not configure any Webhook URL, skip the Fetch and run directly on browser
+        if (!webhookEndpoint || webhookEndpoint.includes("your-webhook-here")) {
+          showNotification("Running direct serverless analysis client-side...", "info");
+          const structuredResults = await runClientSideAudit(contractText);
+          resetSecondaryPanels(structuredResults.contractType);
+          renderResults(structuredResults);
+          showToast("Strategic Audit Completed!");
+          return;
         }
 
         // Call the Make Webhook
@@ -827,7 +904,6 @@
           throw new Error(`Your Make.com Webhook returned status ${response.status}. Please check your Make scenario run logs.`);
         }
 
-        // --- SAFE TEXT PARSING TO PREVENT CRASHES ---
         const responseText = await response.text();
         let structuredResults = null;
 
@@ -836,31 +912,22 @@
           // Gracefully unpack payload if wrapped inside a results key or data key
           structuredResults = parsed.data || parsed;
         } catch (jsonErr) {
-          // If the raw response is exactly Make's default text, throw a highly specific, formatted error
+          // INTERCEPT ASYNCHRONOUS "ACCEPTED" STRING AND RUN DIRECT CLIENT SIDE RENDER
           if (responseText.trim() === "Accepted") {
-            throw new Error(`Your Make.com scenario received the contract, but replied with the default <strong>"Accepted"</strong> receipt instead of the analyzed data.<br><br><strong>Why this happens:</strong> This means your Make scenario ran, but **encountered an error or stopped** (likely in the Google Gemini step) before it could reach the <strong>Webhook Response</strong> module.<br><br><strong>How to fix:</strong><br>1. In Make.com, click on the <strong>History</strong> tab (or the clock icon) to see the execution log.<br>2. Look for any red warning/error icons on your Google Gemini module.<br>3. Ensure your Google Gemini module has a valid, active API connection/Key.`);
+            showNotification("Make.com returned asynchronous 'Accepted'. Processing client-side instantly...", "warning");
+            structuredResults = await runClientSideAudit(contractText);
           } else {
-            throw new Error(`The webhook returned an invalid JSON response structure:<br><br><code class="text-xs bg-slate-950 p-2 block border border-slate-800 text-rose-300 font-mono">${responseText.substring(0, 150)}...</code><br><br>Please verify your Webhook Response payload mapping.`);
+            throw new Error(`The webhook returned an invalid JSON response structure:<br><br><code class="text-xs bg-slate-950 p-2 block border border-slate-800 text-rose-300 font-mono">${responseText.substring(0, 150)}...</code>`);
           }
         }
 
         // Validate that returned data satisfies standard schema attributes
         if (!structuredResults.contractType || typeof structuredResults.overallRiskScore === 'undefined') {
-          throw new Error("Make.com triggered successfully, but did not return a valid structured audit object.<br><br>Make sure your scenario concludes with a <strong>'Webhook Response'</strong> module passing the structured JSON string from the Google Gemini module back to the requester.");
+          showNotification("Make.com payload is incomplete. Direct client-side audit completed instead.", "warning");
+          structuredResults = await runClientSideAudit(contractText);
         }
         
-        // Reset secondary panels
-        document.getElementById('brief-placeholder').classList.remove('hidden');
-        document.getElementById('brief-content').classList.add('hidden');
-        document.getElementById('chat-messages').innerHTML = `
-          <div class="flex items-start space-x-2.5">
-            <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
-            <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-200 leading-relaxed max-w-[85%]">
-              Greetings, Negotiator. I am grounded in your ${structuredResults.contractType} specifications. Ask me to modify any clause or check liabilities.
-            </div>
-          </div>
-        `;
-
+        resetSecondaryPanels(structuredResults.contractType);
         renderResults(structuredResults);
         showToast("Make.com Pipeline Audit Completed!");
 
