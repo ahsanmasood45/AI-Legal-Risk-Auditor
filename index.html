@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#0a0f1d] text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LegisShield AI - Interactive Legal Risk Auditor</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f4f6fe',
+              100: '#e9edfd',
+              500: '#4f46e5',
+              600: '#4338ca',
+              900: '#1e1b4b',
+            },
+            risk: {
+              safe: '#10b981',      // Emerald
+              low: '#3b82f6',       // Blue
+              medium: '#f59e0b',    // Amber
+              high: '#ef4444',      // Red
+              severe: '#7f1d1d',    // Dark Red
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- PDF.js library for complete browser-side extraction -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .gradient-border-glow {
+      position: relative;
+    }
+    .gradient-border-glow::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(90deg, #4f46e5, #06b6d4);
+      border-radius: inherit;
+      z-index: -1;
+      opacity: 0.15;
+      transition: opacity 0.3s ease;
+    }
+    .gradient-border-glow:hover::after {
+      opacity: 0.35;
+    }
+    /* Simple custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Header -->
+  <header class="glass-panel sticky top-0 z-40 border-b border-slate-800/80 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">LegisShield AI</h1>
+        <p class="text-[10px] uppercase tracking-wider text-indigo-400 font-semibold">Contract Intelligence System</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium bg-indigo-950/40 text-indigo-300 border border-indigo-500/15">
+        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>⚡ Make.com Webhook Connected</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- LEFT SIDE: Upload & Configuration (5 cols) -->
+    <div class="lg:col-span-5 flex flex-col space-y-6">
+      
+      <!-- Input Section -->
+      <div class="glass-panel rounded-2xl p-6 flex flex-col space-y-5">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center space-x-2">
+            <svg class="h-5 w-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>Analyze Contract</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Upload an agreement or paste terms below to audit operational liabilities.</p>
+        </div>
+
+        <!-- Input Type Switcher Tabs -->
+        <div class="flex p-1 bg-slate-900/95 rounded-xl border border-slate-800">
+          <button id="tab-upload" onclick="switchInputTab('upload')" class="flex-1 text-center py-2 text-xs font-semibold rounded-lg transition bg-indigo-600 text-white">
+            Upload File (.pdf / .txt)
+          </button>
+          <button id="tab-text" onclick="switchInputTab('text')" class="flex-1 text-center py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition">
+            Paste Contract Text
+          </button>
+        </div>
+
+        <!-- FILE UPLOAD DRAGZONE -->
+        <div id="upload-container" class="space-y-4">
+          <div id="dropzone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500/60 bg-slate-900/40 rounded-xl p-8 text-center cursor-pointer transition flex flex-col items-center justify-center group relative">
+            <input type="file" id="fileInput" accept=".pdf,.txt" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(event)">
+            
+            <div id="dropzone-prompt" class="space-y-3">
+              <div class="h-12 w-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto group-hover:bg-indigo-950/40 group-hover:text-indigo-400 transition-colors">
+                <svg class="h-6 w-6 text-slate-400 group-hover:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-slate-200">Drag & drop your contract file</p>
+                <p class="text-xs text-slate-500 mt-1">Accepts PDF or TXT (Max size 10MB)</p>
+              </div>
+            </div>
+
+            <div id="file-info" class="hidden space-y-2">
+              <div class="h-12 w-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <p id="fileName" class="text-sm font-semibold text-slate-200 truncate max-w-xs mx-auto"></p>
+              <button type="button" onclick="resetFileSelection(event)" class="text-xs text-rose-400 hover:text-rose-300 underline font-medium">Remove File</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASTE TEXT AREA -->
+        <div id="text-container" class="hidden">
+          <textarea id="contractTextInput" rows="8" placeholder="Paste the clauses, terms, or entire legal agreement text here..." class="w-full bg-slate-900/60 rounded-xl p-3 text-xs border border-slate-700/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-300 placeholder-slate-500 outline-none transition"></textarea>
+        </div>
+
+        <!-- PRIMARY CALL TO ACTION BUTTON -->
+        <button id="btn-audit" onclick="triggerAudit()" class="w-full relative gradient-border-glow bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/15 text-sm transition-all flex items-center justify-center space-x-2">
+          <span>⚡ Generate Strategic Audit</span>
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </button>
+        
+        <!-- DEMO TRIGGER (Zero Friction Option) -->
+        <div class="pt-3 border-t border-slate-800/80">
+          <p class="text-[10px] text-slate-500 uppercase tracking-widest text-center mb-2.5 font-bold">Or Test Drive The System Instantly</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="loadSample('nda')" class="px-2.5 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800 hover:border-slate-700 hover:bg-slate-800/50 text-slate-300 text-[11px] font-medium transition text-left flex items-center justify-between group">
+              <span>NDA with Hidden Loophole</span>
+              <span class="text-indigo-400 group-hover:translate-x-0.5 transition-transform">→</span>
+            </button>
+            <button onclick="loadSample('saas')" class="px-2.5 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800 hover:border-slate-700 hover:bg-slate-800/50 text-slate-300 text-[11px] font-medium transition text-left flex items-center justify-between group">
+              <span>SaaS SLA Exposure</span>
+              <span class="text-indigo-400 group-hover:translate-x-0.5 transition-transform">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- No-Code Pipeline Settings Panel -->
+      <div class="glass-panel rounded-2xl p-4">
+        <button onclick="toggleSettings()" class="w-full flex items-center justify-between text-xs text-slate-400 hover:text-slate-200 transition font-medium">
+          <span class="flex items-center space-x-2">
+            <svg class="h-4 w-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <span>No-Code Pipeline Hook</span>
+          </span>
+          <span id="settings-arrow">▼</span>
+        </button>
+        <div id="settings-content" class="hidden mt-3 pt-3 border-t border-slate-800/80 space-y-3">
+          <div>
+            <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Make.com Webhook Endpoint</label>
+            <input type="text" id="webhookUrl" value="https://hook.us2.make.com/2zll771322nbbw6xrb18t54xc5e23yx2" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 font-mono focus:border-indigo-500 outline-none">
+            <p class="text-[10px] text-slate-500 mt-1">Directly trigger your automated workflows on contract analysis requests.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDE: Results Screen (7 cols) -->
+    <div class="lg:col-span-7 flex flex-col min-h-[500px]">
+      
+      <!-- EMPTY STATE -->
+      <div id="state-empty" class="glass-panel rounded-2xl flex-grow flex flex-col items-center justify-center p-8 text-center border-dashed border-slate-800">
+        <div class="h-20 w-20 rounded-2xl bg-indigo-500/5 flex items-center justify-center border border-indigo-500/10 mb-6">
+          <svg class="h-10 w-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-white">System Awaiting Document</h3>
+        <p class="text-sm text-slate-400 max-w-md mx-auto mt-2 leading-relaxed">
+          Upload a legal agreement or run one of our ready-made scenarios. Analysis executes securely using your custom Make.com workflow.
+        </p>
+        <button onclick="loadSample('nda')" class="mt-6 inline-flex items-center space-x-2 px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/10 transition">
+          <span>Run Immediate Demo Analysis</span>
+          <span>→</span>
+        </button>
+      </div>
+
+      <!-- LOADING STATE (With simulated stages of scanning for elite realism) -->
+      <div id="state-loading" class="hidden glass-panel rounded-2xl flex-grow flex flex-col items-center justify-center p-8 text-center">
+        <!-- Modern Spinner -->
+        <div class="relative h-16 w-16 mb-6">
+          <div class="absolute inset-0 rounded-full border-4 border-indigo-500/10"></div>
+          <div class="absolute inset-0 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2" id="loader-title">Extracting Document Data</h3>
+        <p class="text-sm text-slate-400 max-w-sm mx-auto animate-pulse" id="loader-status">Parsing contract structure and locating key signatures...</p>
+        
+        <!-- Live steps list -->
+        <div class="mt-8 w-full max-w-xs space-y-3 text-left border-t border-slate-800 pt-6">
+          <div class="flex items-center space-x-3 text-xs" id="step-1">
+            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-indigo-500/20 text-indigo-400 font-bold">1</span>
+            <span class="text-slate-300">File extraction & buffer conversion</span>
+          </div>
+          <div class="flex items-center space-x-3 text-xs opacity-40" id="step-2">
+            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold">2</span>
+            <span class="text-slate-400">Make.com webhook workflow routing</span>
+          </div>
+          <div class="flex items-center space-x-3 text-xs opacity-40" id="step-3">
+            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold">3</span>
+            <span class="text-slate-400">Structured audit output formatting</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN RESULTS DASHBOARD -->
+      <div id="state-results" class="hidden flex-col space-y-6">
+        
+        <!-- TOP META CARD (Contract Type & Risk Ring Indicator) -->
+        <div class="glass-panel rounded-2xl p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          
+          <!-- Radial Score Ring -->
+          <div class="md:col-span-4 flex flex-col items-center border-b md:border-b-0 md:border-r border-slate-800/80 pb-6 md:pb-0 md:pr-6">
+            <div class="relative h-32 w-32 flex items-center justify-center">
+              <!-- Background Ring -->
+              <svg class="absolute inset-0 transform -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="rgba(30, 41, 59, 1)" stroke-width="8" fill="none"></circle>
+                <!-- Foreground Active Ring -->
+                <circle id="score-ring" cx="50" cy="50" r="40" stroke="url(#gradient-accent)" stroke-width="8" stroke-dasharray="251.2" stroke-dashoffset="100" stroke-linecap="round" fill="none" class="transition-all duration-1000 ease-out"></circle>
+                
+                <defs>
+                  <linearGradient id="gradient-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#4f46e5" />
+                    <stop offset="100%" stop-color="#06b6d4" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="text-center">
+                <span class="block text-3xl font-extrabold text-white" id="score-text">0</span>
+                <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Risk Index</span>
+              </div>
+            </div>
+            <div class="mt-4 px-3 py-1 rounded-full text-xs font-semibold" id="risk-badge">
+              HIGH RISK
+            </div>
+          </div>
+
+          <!-- Document details & executive summary -->
+          <div class="md:col-span-8 space-y-3">
+            <div class="flex items-center space-x-2">
+              <span class="text-[10px] tracking-wider uppercase bg-indigo-500/10 text-indigo-300 font-bold px-2.5 py-1 rounded-lg border border-indigo-500/15" id="res-contractType">
+                NDA
+              </span>
+              <span class="text-xs text-slate-400">• Dynamic Audit Complete</span>
+            </div>
+            <h3 class="text-xl font-bold text-white">General Counsel Audit Summary</h3>
+            <p class="text-xs text-slate-300 leading-relaxed italic border-l-2 border-indigo-500 pl-3" id="res-summary">
+              Analyzing terms reveals high exposure to indefinite liability streams. A restructuring of standard redline conditions is highly encouraged.
+            </p>
+          </div>
+        </div>
+
+        <!-- ANALYSIS NAVIGATION TABS -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 bg-slate-900/95 rounded-xl border border-slate-800">
+          <button id="subtab-risks" onclick="switchResultSubtab('risks')" class="text-center py-2 text-[11px] font-semibold rounded-lg transition bg-indigo-600 text-white flex items-center justify-center space-x-1">
+            <span>Risks</span>
+            <span class="bg-slate-950/40 text-slate-200 px-1.5 py-0.2 rounded text-[9px] font-bold" id="badge-count-risks">0</span>
+          </button>
+          <button id="subtab-missing" onclick="switchResultSubtab('missing')" class="text-center py-2 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center justify-center space-x-1">
+            <span>Missing Clauses</span>
+            <span class="bg-slate-950/40 text-slate-400 px-1.5 py-0.2 rounded text-[9px] font-bold" id="badge-count-missing">0</span>
+          </button>
+          <button id="subtab-brief" onclick="switchResultSubtab('brief')" class="text-center py-2 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center justify-center space-x-1">
+            <span>✨ Negotiation Brief</span>
+          </button>
+          <button id="subtab-chat" onclick="switchResultSubtab('chat')" class="text-center py-2 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center justify-center space-x-1">
+            <span>✨ Clause Chatbot</span>
+          </button>
+        </div>
+
+        <!-- RISK MATRIX PANEL -->
+        <div id="panel-risks" class="space-y-4">
+          <!-- Severity Filter Bar -->
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-slate-400 font-medium">Filter by severity matrix:</p>
+            <div class="flex items-center space-x-2">
+              <button onclick="filterRisks('ALL')" class="px-2.5 py-1 rounded bg-slate-800 text-[10px] font-semibold text-white transition hover:bg-slate-700" id="filter-all">All</button>
+              <button onclick="filterRisks('HIGH')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-rose-400 border border-rose-900/30 hover:bg-slate-800 transition" id="filter-high">High</button>
+              <button onclick="filterRisks('MEDIUM')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-amber-400 border border-amber-900/30 hover:bg-slate-800 transition" id="filter-medium">Medium</button>
+              <button onclick="filterRisks('LOW')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-blue-400 border border-blue-900/30 hover:bg-slate-800 transition" id="filter-low">Low</button>
+            </div>
+          </div>
+
+          <!-- Dynamic Risks List container -->
+          <div id="risks-list" class="space-y-4">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- MISSING CLAUSES Blueprint Panel -->
+        <div id="panel-missing" class="hidden space-y-4">
+          <div id="missing-list" class="grid grid-cols-1 gap-4">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- STRATEGIC NEGOTIATION BRIEF PANEL -->
+        <div id="panel-brief" class="hidden space-y-4">
+          <div class="glass-panel rounded-xl p-5 border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="text-sm font-bold text-white">✨ Tactical Negotiation Briefing</h4>
+                <p class="text-[11px] text-slate-400">Synthesize the legal risks into high-impact talking points and draft correspondence.</p>
+              </div>
+              <button onclick="generateNegotiationBrief()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold text-white transition flex items-center space-x-1">
+                <span>✨ Build Brief</span>
+              </button>
+            </div>
+
+            <!-- Loading overlay for Brief Generator -->
+            <div id="brief-loading" class="hidden flex-col items-center justify-center py-12 space-y-3">
+              <div class="h-8 w-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin"></div>
+              <p class="text-xs text-indigo-400">Master negotiator constructing talking points...</p>
+            </div>
+
+            <!-- Brief Render Destination -->
+            <div id="brief-content" class="space-y-5 hidden">
+              <!-- Strategic Posture -->
+              <div class="p-3 bg-indigo-950/20 rounded-lg border border-indigo-500/10">
+                <span class="text-[10px] uppercase font-bold text-indigo-300">Strategic Negotiation Posture</span>
+                <p id="brief-posture" class="text-xs text-slate-200 mt-1 leading-relaxed"></p>
+              </div>
+
+              <!-- Top Leverage Points -->
+              <div class="space-y-2">
+                <span class="text-[10px] uppercase font-bold text-indigo-300">Key Counter-Proposals (Bargaining Chips)</span>
+                <ul id="brief-leverage" class="list-disc list-inside text-xs text-slate-300 space-y-1 pl-1">
+                  <!-- JS injected -->
+                </ul>
+              </div>
+
+              <!-- Email Draft -->
+              <div class="space-y-2 relative">
+                <span class="text-[10px] uppercase font-bold text-emerald-400">Counter-Proposal Draft Email</span>
+                <div class="bg-slate-950/40 rounded-lg p-3.5 border border-indigo-500/10 relative">
+                  <pre id="brief-email" class="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed select-all overflow-x-auto"></pre>
+                  <button onclick="copyRawText('brief-email')" class="absolute top-3.5 right-3 text-slate-500 hover:text-white transition" title="Copy email draft to clipboard">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div id="brief-placeholder" class="text-center py-8">
+              <p class="text-xs text-slate-500">Click "Build Brief" to analyze terms and generate a negotiation guide.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLAUSE CHATBOT PANEL -->
+        <div id="panel-chat" class="hidden space-y-4">
+          <div class="glass-panel rounded-xl p-5 border border-slate-800 flex flex-col h-[480px]">
+            <!-- Header -->
+            <div class="border-b border-slate-800 pb-3">
+              <h4 class="text-sm font-bold text-white">✨ Interactive Contract Copilot</h4>
+              <p class="text-[11px] text-slate-400">Ask questions, locate specific provisions, or ask the Copilot to draft protective revisions.</p>
+            </div>
+
+            <!-- Messages Stream -->
+            <div id="chat-messages" class="flex-grow overflow-y-auto my-4 space-y-4 pr-1">
+              <div class="flex items-start space-x-2.5">
+                <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">
+                  AI
+                </div>
+                <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-200 leading-relaxed max-w-[85%]">
+                  Greetings, Negotiator. I am grounded in your contract specifications and audit layout. Ask me to modify any clause, verify regulatory exposure, or scan for hidden terms.
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat input -->
+            <div class="flex items-center space-x-2 border-t border-slate-800 pt-3">
+              <input type="text" id="chat-input" onkeydown="handleChatKeyDown(event)" placeholder="Ask the copilot anything about this contract..." class="flex-grow bg-slate-950/60 rounded-xl px-3.5 py-2.5 text-xs border border-slate-700/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-300 outline-none transition">
+              <button onclick="sendChatMessage()" class="p-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center justify-center">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Notification Feed for actions inside sandbox -->
+  <div id="notification-hub" class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- Custom Alert Modal (Zero window.alert replacement) -->
+  <div id="custom-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+      <div class="h-12 w-12 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center mb-4">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+      </div>
+      <h4 class="text-lg font-bold text-white" id="modal-title">API Execution Warning</h4>
+      <p class="text-sm text-slate-400 mt-2 leading-relaxed" id="modal-description">
+        Something went wrong.
+      </p>
+      <div class="mt-6 flex space-x-3">
+        <button onclick="closeModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2 px-4 rounded-xl text-xs transition">
+          Acknowledge
+        </button>
+        <button onclick="forceDemoTrigger()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-xl text-xs transition">
+          Run Demo Sandbox
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Logic -->
+  <script>
+    // Initialize PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    let activeInputTab = 'upload';
+    let activeResultSubtab = 'risks';
+    let uploadedFile = null;
+    let auditReportData = null; // Store active report state
+    let extractedTextContent = ""; // Extracted raw text from uploaded contract
+    
+    // Serverless Gemini API Configuration for Chat/Brief
+    const apiKey = ""; // Runtime automatically provisions this key
+    const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+
+    // High fidelity sample data representing robust audits
+    const SAMPLE_NDAS = {
+      nda: {
+        contractType: "Non-Disclosure Agreement (Unilateral)",
+        overallRiskScore: 78,
+        riskTier: "HIGH EXPOSURE",
+        summary: "This agreement is highly non-mutual and asymmetric. It protects the Disclosing Party aggressively while leaving the Receiving Party vulnerable to intellectual property contamination, excessive indemnification, and endless duration bounds.",
+        risks: [
+          {
+            clauseName: "Perpetual Confidentiality Term",
+            severity: "HIGH",
+            excerpt: "All obligations of confidentiality hereunder shall survive indefinitely regardless of any expiration or termination of the relationship between the parties.",
+            impact: "Creates an eternal record-keeping liability. If an ex-employee uses general business knowledge 15 years from now, the counterparty can claim a trade secret breach, triggering costly litigation.",
+            mitigation: "Except with respect to trade secrets under applicable statutory law, all obligations of confidentiality under this Agreement shall expire three (3) years from the effective date."
+          },
+          {
+            clauseName: "Unilateral Intellectual Property Assignment",
+            severity: "HIGH",
+            excerpt: "Any modifications, improvements, or feedback proposed by Receiving Party to Disclosing Party's technology shall instantly be owned solely by Disclosing Party.",
+            impact: "Feedback loop traps. Your product suggestions immediately transfer intellectual rights to them without royalty, locking you out of self-developing complementary systems.",
+            mitigation: "All feedback is provided 'AS-IS'. Receiving Party grants Disclosing Party a non-exclusive, royalty-free, perpetual license to use such feedback, retaining ownership of its own inventions."
+          },
+          {
+            clauseName: "Asymmetric Dispute Resolution Venue",
+            severity: "MEDIUM",
+            excerpt: "This agreement is governed by the laws of New South Wales, Australia, and any disputes shall be settled exclusively in courts therein.",
+            impact: "If a dispute occurs, you must hire foreign lawyers and pay travel costs to defend yourself, drastically shifting bargaining power in their favor.",
+            mitigation: "This Agreement shall be governed by local laws where the defendant in any dispute resides, and courts therein shall hold jurisdiction."
+          }
+        ],
+        missingClauses: [
+          {
+            clauseName: "Mutual Remedies / Fee Shifting Clause",
+            importance: "Ensures the prevailing party in any breach suit gets their attorney fees reimbursed. Without this, they can bleed you financially using high litigation overhead.",
+            recommendedLanguage: "The prevailing party in any action to enforce this Agreement shall be entitled to recover reasonable attorneys' fees, court costs, and related expenses."
+          },
+          {
+            clauseName: "Permitted Disclosures (Legal compulsion)",
+            importance: "Critical safety valve if you are subpoenaed by court or government agency. Without it, complying with the law is technically a breach.",
+            recommendedLanguage: "Receiving Party may disclose Confidential Information pursuant to a subpoena, court order, or government regulation, provided it gives Disclosing Party immediate prior notice to seek a protective order."
+          }
+        ],
+        rawText: "This Non-Disclosure Agreement (the 'Agreement') is entered into by Disclosing Party and Receiving Party. Confidentiality obligations survive indefinitely regardless of expiration of the relationship. Any modifications, improvements, or feedback proposed by Receiving Party shall instantly be owned solely by Disclosing Party. Governed by the laws of New South Wales, Australia."
+      },
+      saas: {
+        contractType: "SaaS Enterprise SLA Agreement",
+        overallRiskScore: 45,
+        riskTier: "MEDIUM RISK",
+        summary: "The Service Level Agreement provides limited system credit returns and heavily shields the service provider from structural outages, forcing the enterprise customer to absorb the cost of direct system downtime.",
+        risks: [
+          {
+            clauseName: "Inconsequential System Credit Restitution",
+            severity: "MEDIUM",
+            excerpt: "Downtime below 95% triggers a service credit equal to 2% of the monthly SaaS fees, which shall serve as the Customer's sole and exclusive remedy.",
+            impact: "A massive multi-hour outage stopping your daily business operations only gets you a negligible discount on next month's bill while you lose thousands in real revenue.",
+            mitigation: "Downtime below 95% shall entitle Customer to a 25% credit. Outages exceeding 8 consecutive hours shall constitute a material breach, giving Customer the right to immediate termination with a prorated refund."
+          },
+          {
+            clauseName: "Provider Exemption of Scheduled Maintenance",
+            severity: "LOW",
+            excerpt: "Scheduled maintenance, declared at the Provider's sole discretion with up to 1 hour notice, shall be completely excluded from uptime calculations.",
+            impact: "The provider can shut down the systems during busy hours with almost zero warning and avoid getting penalized for it.",
+            mitigation: "Scheduled maintenance must be announced at least seven (7) business days in advance, and occur exclusively between 2:00 AM and 5:00 AM EST on weekends."
+          }
+        ],
+        missingClauses: [
+          {
+            clauseName: "Data Portability & Exit Assistance",
+            importance: "Ensures you can get your complete raw database back in structured formats if you decide to cancel or transition service providers.",
+            recommendedLanguage: "Upon termination, Provider shall, within ten (10) business days, deliver to Customer a complete, readable JSON export of all user data at no additional cost."
+          }
+        ],
+        rawText: "SaaS Enterprise Service Level Agreement. Service uptime goal is 99%. Downtime below 95% triggers a service credit equal to 2% of SaaS fees, serving as the sole remedy. Scheduled maintenance, declared at the Provider's sole discretion with up to 1 hour notice, shall be excluded from uptime calculations."
+      }
+    };
+
+    /**
+     * Browser-side Fetch Client equipped with strict exponential backoff algorithm
+     * Retries up to 5 times (1s, 2s, 4s, 8s, 16s delays) on timeouts or transient codes.
+     */
+    async function makeGeminiApiCall(payload) {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+      const retryDelays = [1000, 2000, 4000, 8000, 16000];
+      
+      for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
+        try {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const errorDetails = await response.text();
+            throw new Error(`API returned ${response.status}: ${errorDetails}`);
+          }
+
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          if (attempt === retryDelays.length) {
+            throw new Error(`Connection failed after ${attempt + 1} retries: ${error.message}`);
+          }
+          // Silent delay - wait specified delay before executing retry loop
+          await new Promise(resolve => setTimeout(resolve, retryDelays[attempt]));
+        }
+      }
+    }
+
+    /**
+     * Collapses or Expands Developer Panel
+     */
+    function toggleSettings() {
+      const content = document.getElementById('settings-content');
+      const arrow = document.getElementById('settings-arrow');
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        arrow.textContent = '▲';
+      } else {
+        content.classList.add('hidden');
+        arrow.textContent = '▼';
+      }
+    }
+
+    /**
+     * Tabs between file upload and raw pasting
+     */
+    function switchInputTab(tab) {
+      activeInputTab = tab;
+      const btnUpload = document.getElementById('tab-upload');
+      const btnText = document.getElementById('tab-text');
+      const upContainer = document.getElementById('upload-container');
+      const textContainer = document.getElementById('text-container');
+
+      if (tab === 'upload') {
+        btnUpload.className = "flex-1 text-center py-2 text-xs font-semibold rounded-lg transition bg-indigo-600 text-white";
+        btnText.className = "flex-1 text-center py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition";
+        upContainer.classList.remove('hidden');
+        textContainer.classList.add('hidden');
+      } else {
+        btnText.className = "flex-1 text-center py-2 text-xs font-semibold rounded-lg transition bg-indigo-600 text-white";
+        btnUpload.className = "flex-1 text-center py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition";
+        textContainer.classList.remove('hidden');
+        upContainer.classList.add('hidden');
+      }
+    }
+
+    /**
+     * Swaps display between Explicit Risks and Missing protections tables
+     */
+    function switchResultSubtab(subtab) {
+      activeResultSubtab = subtab;
+      
+      const subTabsList = ['risks', 'missing', 'brief', 'chat'];
+      subTabsList.forEach(item => {
+        const btn = document.getElementById(`subtab-${item}`);
+        const panel = document.getElementById(`panel-${item}`);
+        
+        if (item === subtab) {
+          btn.className = "text-center py-2 text-[11px] font-semibold rounded-lg transition bg-indigo-600 text-white flex items-center justify-center space-x-1";
+          panel.classList.remove('hidden');
+        } else {
+          btn.className = "text-center py-2 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center justify-center space-x-1";
+          panel.classList.add('hidden');
+        }
+      });
+    }
+
+    /**
+     * Handlers for file selection & drop interfaces
+     */
+    function handleFileSelect(e) {
+      const files = e.target.files || e.dataTransfer.files;
+      if (files.length > 0) {
+        uploadedFile = files[0];
+        document.getElementById('dropzone-prompt').classList.add('hidden');
+        const fileInfo = document.getElementById('file-info');
+        fileInfo.classList.remove('hidden');
+        document.getElementById('fileName').textContent = `${uploadedFile.name} (${(uploadedFile.size/1024).toFixed(1)} KB)`;
+        showToast("File loaded successfully.");
+      }
+    }
+
+    function resetFileSelection(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      uploadedFile = null;
+      extractedTextContent = "";
+      document.getElementById('fileInput').value = '';
+      document.getElementById('dropzone-prompt').classList.remove('hidden');
+      document.getElementById('file-info').classList.add('hidden');
+      showToast("File selection reset.");
+    }
+
+    /**
+     * Client-side text extraction from PDF using PDF.js or standard text FileReader
+     */
+    async function extractTextFromFile(file) {
+      if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = (err) => reject(err);
+          reader.readAsText(file);
+        });
+      } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let completeText = "";
+        
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const strings = textContent.items.map(item => item.str);
+          completeText += strings.join(" ") + "\n";
+        }
+        
+        return completeText;
+      } else {
+        throw new Error("Unsupported file format. Please upload a PDF or TXT document.");
+      }
+    }
+
+    /**
+     * Loads predefined sample contract audits (Predefined Sandboxes)
+     */
+    function loadSample(type) {
+      showLoadingScreen();
+      setTimeout(() => {
+        const data = SAMPLE_NDAS[type];
+        extractedTextContent = data.rawText;
+        
+        // Reset subpanels when switching contracts
+        document.getElementById('brief-placeholder').classList.remove('hidden');
+        document.getElementById('brief-content').classList.add('hidden');
+        document.getElementById('chat-messages').innerHTML = `
+          <div class="flex items-start space-x-2.5">
+            <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
+            <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-200 leading-relaxed max-w-[85%]">
+              Greetings, Negotiator. I am grounded in your ${data.contractType} specifications. Ask me to modify any clause or check liabilities.
+            </div>
+          </div>
+        `;
+
+        renderResults(data);
+        showToast(`Loaded ${data.contractType} Simulation Model`);
+      }, 1500);
+    }
+
+    /**
+     * Renders loading skeletons with realistic sequential stages
+     */
+    function showLoadingScreen() {
+      document.getElementById('state-empty').classList.add('hidden');
+      document.getElementById('state-results').classList.add('hidden');
+      const loader = document.getElementById('state-loading');
+      loader.classList.remove('hidden');
+
+      // Reset loading steps visual
+      for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById(`step-${i}`);
+        el.classList.add('opacity-40');
+        const span = el.querySelector('span');
+        span.className = "h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold";
+        span.textContent = i;
+      }
+
+      const steps = [
+        { title: "Extracting Document Buffer", status: "Converting text and formatting PDF layers client-side...", step: 1 },
+        { title: "Triggering Automated Make Pipeline", status: "Sending payload to your custom scenario endpoint...", step: 2 },
+        { title: "Compiling Structured Response", status: "Formulating risks and recommended redline rewrites...", step: 3 }
+      ];
+
+      steps.forEach((s, idx) => {
+        setTimeout(() => {
+          document.getElementById('loader-title').textContent = s.title;
+          document.getElementById('loader-status').textContent = s.status;
+          
+          const stepEl = document.getElementById(`step-${s.step}`);
+          stepEl.classList.remove('opacity-40');
+          const span = stepEl.querySelector('span');
+          span.className = "h-5 w-5 rounded-full flex items-center justify-center bg-emerald-500 text-slate-950 font-bold";
+          span.innerHTML = `<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+        }, idx * 700);
+      });
+    }
+
+    /**
+     * Primary Audit Trigger: Routes extraction data directly to your Make.com Webhook
+     */
+    async function triggerAudit() {
+      const isTextMode = activeInputTab === 'text';
+      let contractText = "";
+
+      try {
+        if (isTextMode) {
+          contractText = document.getElementById('contractTextInput').value;
+          if (!contractText || contractText.trim().length < 50) {
+            showNotification("Paste a larger contract segment (at least 50 chars) to initiate analysis.", "warning");
+            return;
+          }
+        } else {
+          if (!uploadedFile) {
+            showNotification("Please drop a PDF / TXT contract file first.", "warning");
+            return;
+          }
+          showLoadingScreen();
+          contractText = await extractTextFromFile(uploadedFile);
+        }
+
+        // Keep local memory copy of analyzed content for future chatbot inquiries
+        extractedTextContent = contractText;
+
+        // Make sure loading panel is open
+        if (isTextMode) showLoadingScreen();
+
+        const webhookEndpoint = document.getElementById('webhookUrl').value.trim();
+        if (!webhookEndpoint) {
+          throw new Error("No Make.com Webhook URL has been configured in your settings panel.");
+        }
+
+        // Call the Make Webhook
+        const response = await fetch(webhookEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: contractText,
+            filename: uploadedFile ? uploadedFile.name : "pasted_text.txt",
+            timestamp: new Date().toISOString()
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Your Make.com Webhook returned status ${response.status}. Please check your Make scenario run logs.`);
+        }
+
+        const responseData = await response.json();
+        
+        // Gracefully unpack payload if wrapped inside a results key or data key
+        const structuredResults = responseData.data || responseData;
+
+        // Validate that returned data satisfies standard schema attributes
+        if (!structuredResults.contractType || typeof structuredResults.overallRiskScore === 'undefined') {
+          throw new Error("Make.com triggered successfully, but did not return a valid structured audit object.<br><br>Make sure your scenario concludes with a <strong>'Webhook Response'</strong> module passing the structured JSON string from the Google Gemini module back to the requester.");
+        }
+        
+        // Reset secondary panels
+        document.getElementById('brief-placeholder').classList.remove('hidden');
+        document.getElementById('brief-content').classList.add('hidden');
+        document.getElementById('chat-messages').innerHTML = `
+          <div class="flex items-start space-x-2.5">
+            <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
+            <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-200 leading-relaxed max-w-[85%]">
+              Greetings, Negotiator. I am grounded in your ${structuredResults.contractType} specifications. Ask me to modify any clause or check liabilities.
+            </div>
+          </div>
+        `;
+
+        renderResults(structuredResults);
+        showToast("Make.com Pipeline Audit Completed!");
+
+      } catch (error) {
+        document.getElementById('state-loading').classList.add('hidden');
+        document.getElementById('state-empty').classList.remove('hidden');
+
+        document.getElementById('modal-title').textContent = "Pipeline Integration Warning";
+        document.getElementById('modal-description').innerHTML = `
+          An error occurred while calling your custom Make.com pipeline.
+          <br><br>
+          <span class="text-xs text-rose-300">Technical Details: ${error.message}</span>
+          <br><br>
+          You can continue evaluating design layouts using pre-analyzed dry runs in the safe sandbox below.
+        `;
+        document.getElementById('custom-modal').classList.remove('hidden');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('custom-modal').classList.add('hidden');
+    }
+
+    function forceDemoTrigger() {
+      closeModal();
+      loadSample('nda');
+    }
+
+    /**
+     * Dynamically renders JSON structured outputs into visual cards
+     */
+    function renderResults(data) {
+      auditReportData = data; // Keep tracking
+      
+      // Stop Loading Screen
+      document.getElementById('state-loading').classList.add('hidden');
+      document.getElementById('state-results').classList.remove('hidden');
+
+      // Set Metadata values
+      document.getElementById('res-contractType').textContent = data.contractType;
+      document.getElementById('res-summary').textContent = data.summary;
+      document.getElementById('badge-count-risks').textContent = data.risks.length;
+      document.getElementById('badge-count-missing').textContent = data.missingClauses.length;
+
+      // Render score ring & text
+      const score = data.overallRiskScore;
+      document.getElementById('score-text').textContent = score;
+      
+      const offset = 251.2 - (251.2 * score) / 100;
+      const scoreRing = document.getElementById('score-ring');
+      scoreRing.style.strokeDashoffset = offset;
+
+      // Handle Category tag color
+      const badge = document.getElementById('risk-badge');
+      badge.textContent = `${data.riskTier} (${score}/100)`;
+      
+      if (score >= 70) {
+        badge.className = "mt-4 px-3 py-1.5 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20";
+        scoreRing.setAttribute('stroke', '#ef4444');
+      } else if (score >= 40) {
+        badge.className = "mt-4 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20";
+        scoreRing.setAttribute('stroke', '#f59e0b');
+      } else {
+        badge.className = "mt-4 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+        scoreRing.setAttribute('stroke', '#10b981');
+      }
+
+      // Populate Explicit Risks Matrix
+      populateRisks(data.risks);
+
+      // Populate Missing Clauses Table
+      populateMissing(data.missingClauses);
+
+      // Default back to explicit risks panel tab view
+      switchResultSubtab('risks');
+    }
+
+    function populateRisks(risksListArray) {
+      const container = document.getElementById('risks-list');
+      container.innerHTML = '';
+
+      if (risksListArray.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 bg-slate-900/30 rounded-xl border border-slate-800">
+            <p class="text-xs text-slate-500">No explicit contract risks detected.</p>
+          </div>
+        `;
+        return;
+      }
+
+      risksListArray.forEach((r, index) => {
+        const severityClass = getSeverityTagStyle(r.severity);
+        
+        const card = document.createElement('div');
+        card.className = "glass-panel rounded-xl p-5 border border-slate-800 space-y-3 shadow-md relative overflow-hidden group";
+        card.setAttribute('data-severity', r.severity);
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between space-x-4">
+            <div class="space-y-1">
+              <span class="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded ${severityClass}">
+                ${r.severity} Risk
+              </span>
+              <h4 class="text-sm font-bold text-white mt-1.5 group-hover:text-indigo-300 transition-colors">${r.clauseName}</h4>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2.5">
+            <!-- Left: Impact -->
+            <div class="space-y-1.5">
+              <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">Business Liability Risk</span>
+              <p class="text-xs text-slate-300 leading-relaxed">${r.impact}</p>
+            </div>
+            <!-- Right: Recommended redline mitigation -->
+            <div class="space-y-1.5 bg-slate-950/40 rounded-lg p-3 border border-indigo-500/10 relative">
+              <span class="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block">Proposed Redline Clause</span>
+              <p class="text-xs text-slate-300 font-mono italic pr-6 leading-relaxed select-all" id="redline-text-${index}">${r.mitigation}</p>
+              <button onclick="copyRawText('redline-text-${index}')" class="absolute top-2.5 right-2.5 text-slate-500 hover:text-white transition" title="Copy redline proposal">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Collapsible original text excerpt drawer -->
+          <div class="pt-3 border-t border-slate-800/80">
+            <details class="group/excerpt">
+              <summary class="text-[10px] text-slate-400 cursor-pointer select-none font-bold hover:text-slate-200 uppercase tracking-widest list-none flex items-center justify-between">
+                <span>View Exact Verbatim Contract Excerpt</span>
+                <span class="group-open/excerpt:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div class="mt-2 text-xs text-slate-400 font-mono bg-slate-950/60 p-2.5 rounded border border-slate-900 leading-relaxed">
+                "${r.excerpt}"
+              </div>
+            </details>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function populateMissing(missingListArray) {
+      const container = document.getElementById('missing-list');
+      container.innerHTML = '';
+
+      if (missingListArray.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 bg-slate-900/30 rounded-xl border border-slate-800">
+            <p class="text-xs text-slate-500">All standard commercial legal protections seem present.</p>
+          </div>
+        `;
+        return;
+      }
+
+      missingListArray.forEach((m, index) => {
+        const card = document.createElement('div');
+        card.className = "glass-panel rounded-xl p-5 border border-slate-800 space-y-3 shadow-md relative";
+        
+        card.innerHTML = `
+          <div>
+            <span class="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">
+              Absent Requirement
+            </span>
+            <h4 class="text-sm font-bold text-white mt-2">${m.clauseName}</h4>
+          </div>
+          
+          <div class="space-y-2">
+            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">Why It Matters</span>
+            <p class="text-xs text-slate-300 leading-relaxed">${m.importance}</p>
+          </div>
+
+          <div class="bg-slate-950/40 rounded-lg p-3.5 border border-indigo-500/10 relative">
+            <span class="text-[10px] uppercase tracking-wider text-indigo-400 font-bold block mb-1">Standard Boilerplate Recommended Insertion</span>
+            <p class="text-xs text-slate-300 font-mono italic pr-6 leading-relaxed select-all" id="missing-text-${index}">${m.recommendedLanguage}</p>
+            <button onclick="copyRawText('missing-text-${index}')" class="absolute top-3.5 right-3 text-slate-500 hover:text-white transition" title="Copy proposal to clipboard">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+              </svg>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /**
+     * Filters display of risks list by rating severity selection
+     */
+    function filterRisks(severity) {
+      // Toggle button highlight styling
+      const btns = {
+        ALL: 'filter-all',
+        HIGH: 'filter-high',
+        MEDIUM: 'filter-medium',
+        LOW: 'filter-low'
+      };
+
+      for (const [key, id] of Object.entries(btns)) {
+        const el = document.getElementById(id);
+        if (key === severity) {
+          el.className = "px-2.5 py-1 rounded text-[10px] font-semibold text-slate-900 bg-white transition";
+        } else {
+          el.className = `px-2.5 py-1 rounded text-[10px] font-semibold text-${key.toLowerCase()}-400 bg-slate-900/60 border border-slate-800 hover:bg-slate-800 transition`;
+          if (key === 'ALL') el.className = "px-2.5 py-1 rounded text-[10px] font-semibold text-slate-400 bg-slate-900/60 border border-slate-800 hover:bg-slate-800 transition";
+        }
+      }
+
+      // Hide/Show DOM element cards matching selection
+      const list = document.getElementById('risks-list');
+      const cards = list.querySelectorAll('[data-severity]');
+      
+      cards.forEach(card => {
+        const cardSev = card.getAttribute('data-severity');
+        if (severity === 'ALL' || cardSev === severity) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function getSeverityTagStyle(sev) {
+      if (sev === 'HIGH') return "bg-rose-500/10 text-rose-400 border border-rose-500/20";
+      if (sev === 'MEDIUM') return "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+      return "bg-blue-500/10 text-blue-400 border border-blue-500/20";
+    }
+
+    /**
+     * LLM FEATURE: ✨ Tactical Negotiation Brief Generator
+     * Runs specialized system instructions to generate precise bargaining packages
+     */
+    async function generateNegotiationBrief() {
+      if (!auditReportData) {
+        showNotification("Analyze or load a contract first before building strategic briefings.", "warning");
+        return;
+      }
+
+      document.getElementById('brief-placeholder').classList.add('hidden');
+      document.getElementById('brief-content').classList.add('hidden');
+      const loading = document.getElementById('brief-loading');
+      loading.classList.remove('hidden');
+
+      const BRIEF_SCHEMA = {
+        type: "OBJECT",
+        properties: {
+          strategicPosture: { type: "STRING" },
+          leveragePoints: {
+            type: "ARRAY",
+            items: { type: "STRING" }
+          },
+          emailDraft: { type: "STRING" }
+        },
+        required: ["strategicPosture", "leveragePoints", "emailDraft"]
+      };
+
+      const briefPrompt = `You are a corporate legal deal strategist and elite negotiator. Based on the contract type (${auditReportData.contractType}), the overall risk index (${auditReportData.overallRiskScore}/100), and the mapped liabilities:
+      ${JSON.stringify(auditReportData.risks)}
+
+      Produce:
+      1. A strategic posture analysis advising the project manager on exactly how to behave during discussions (e.g. firm, collaborative, uncompromising).
+      2. 3 concrete bargaining leverage points to demand during redlines.
+      3. A professional, direct, polite but uncompromising email drafted to send to the counterparty outlining these objections and requesting negotiations. Keep placeholders standardized (e.g., [Your Name]).`;
+
+      try {
+        const payload = {
+          contents: [{ parts: [{ text: briefPrompt }] }],
+          systemInstruction: { parts: [{ text: "You are a master business contract negotiator. Keep suggestions short, commercial, tactical, and highly clear." }] },
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: BRIEF_SCHEMA,
+            temperature: 0.2
+          }
+        };
+
+        const result = await makeGeminiApiCall(payload);
+        const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!text) throw new Error("Received empty negotiation briefing details.");
+        
+        const briefData = JSON.parse(text);
+
+        // Render Brief UI elements
+        document.getElementById('brief-posture').textContent = briefData.strategicPosture;
+        
+        const ul = document.getElementById('brief-leverage');
+        ul.innerHTML = "";
+        briefData.leveragePoints.forEach(point => {
+          const li = document.createElement('li');
+          li.className = "mb-1";
+          li.textContent = point;
+          ul.appendChild(li);
+        });
+
+        document.getElementById('brief-email').textContent = briefData.emailDraft;
+
+        loading.classList.add('hidden');
+        document.getElementById('brief-content').classList.remove('hidden');
+        showToast("Negotiation Briefing synthesized!");
+
+      } catch (err) {
+        loading.classList.add('hidden');
+        document.getElementById('brief-placeholder').classList.remove('hidden');
+        showNotification("Failed to compile negotiation brief: " + err.message, "error");
+      }
+    }
+
+    /**
+     * LLM FEATURE: ✨ Interactive Grounded Clause Chatbot
+     * Takes direct questions, maintains state, queries Gemini with grounding
+     */
+    async function sendChatMessage() {
+      const inputEl = document.getElementById('chat-input');
+      const queryText = inputEl.value.trim();
+      if (!queryText) return;
+
+      if (!extractedTextContent) {
+        showNotification("Please upload or load a sample contract to interrogate.", "warning");
+        return;
+      }
+
+      // Append user bubble to UI
+      const stream = document.getElementById('chat-messages');
+      const userBubble = document.createElement('div');
+      userBubble.className = "flex items-start justify-end space-x-2.5";
+      userBubble.innerHTML = `
+        <div class="bg-indigo-600 rounded-xl p-3 text-xs text-white leading-relaxed max-w-[85%] select-text">
+          ${queryText}
+        </div>
+        <div class="h-7 w-7 rounded-lg bg-indigo-500 text-slate-950 flex items-center justify-center text-xs font-bold shrink-0">
+          ME
+        </div>
+      `;
+      stream.appendChild(userBubble);
+      stream.scrollTop = stream.scrollHeight;
+      inputEl.value = "";
+
+      // Loading typing indicator
+      const loaderBubble = document.createElement('div');
+      loaderBubble.id = "chat-typing-indicator";
+      loaderBubble.className = "flex items-start space-x-2.5";
+      loaderBubble.innerHTML = `
+        <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
+        <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-400 max-w-[85%] flex items-center space-x-2">
+          <span class="h-2 w-2 rounded-full bg-indigo-500 animate-bounce"></span>
+          <span class="h-2 w-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:0.2s]"></span>
+          <span class="h-2 w-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:0.4s]"></span>
+        </div>
+      `;
+      stream.appendChild(loaderBubble);
+      stream.scrollTop = stream.scrollHeight;
+
+      // Build context payload for Copilot
+      const copilotPrompt = `You are the ultimate commercial legal advisor. You are answering queries about this contract text:
+      ---
+      ${extractedTextContent.substring(0, 40000)}
+      ---
+      
+      The analyzed risk layout is:
+      ${JSON.stringify(auditReportData)}
+
+      User Query: "${queryText}"
+
+      Formulate a precise, clear, and highly practical reply. If asked to draft revisions, provide modular, plug-and-play boilerplate terms that are balanced and fair for the project manager. Limit answer to 1-3 short paragraphs maximum.`;
+
+      try {
+        const payload = {
+          contents: [{ parts: [{ text: copilotPrompt }] }],
+          systemInstruction: { parts: [{ text: "You are an elite legal contract copilot. Answer concisely, precisely, and commercially." }] },
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 800
+          }
+        };
+
+        const result = await makeGeminiApiCall(payload);
+        const rawResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        // Remove typing indicator
+        const typingIndicator = document.getElementById('chat-typing-indicator');
+        if (typingIndicator) stream.removeChild(typingIndicator);
+
+        if (!rawResponse) throw new Error("Copilot returned an empty response candidate.");
+
+        // Append response bubble
+        const aiBubble = document.createElement('div');
+        aiBubble.className = "flex items-start space-x-2.5";
+        aiBubble.innerHTML = `
+          <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
+          <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-800 text-xs text-slate-200 leading-relaxed max-w-[85%] whitespace-pre-wrap select-text">
+            ${rawResponse}
+          </div>
+        `;
+        stream.appendChild(aiBubble);
+        stream.scrollTop = stream.scrollHeight;
+
+      } catch (err) {
+        const typingIndicator = document.getElementById('chat-typing-indicator');
+        if (typingIndicator) stream.removeChild(typingIndicator);
+
+        const aiBubble = document.createElement('div');
+        aiBubble.className = "flex items-start space-x-2.5";
+        aiBubble.innerHTML = `
+          <div class="h-7 w-7 rounded-lg bg-rose-950/40 border border-rose-500/20 text-rose-400 flex items-center justify-center text-xs font-bold shrink-0">ERR</div>
+          <div class="bg-rose-950/20 rounded-xl p-3 border border-rose-900/30 text-xs text-rose-300 leading-relaxed max-w-[85%]">
+            Apologies, I encountered an error answering that question. Technical reasons: ${err.message}
+          </div>
+        `;
+        stream.appendChild(aiBubble);
+        stream.scrollTop = stream.scrollHeight;
+      }
+    }
+
+    function handleChatKeyDown(e) {
+      if (e.key === 'Enter') {
+        sendChatMessage();
+      }
+    }
+
+    /**
+     * Copy string to clipboard supporting iframe contexts robustly
+     */
+    function copyRawText(elementId) {
+      const textToCopy = document.getElementById(elementId).innerText || document.getElementById(elementId).textContent;
+      
+      const tempTextArea = document.createElement('textarea');
+      tempTextArea.value = textToCopy;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      
+      try {
+        const success = document.execCommand('copy');
+        if (success) {
+          showNotification("Snippet copied to clipboard!", "success");
+        } else {
+          showNotification("Unable to copy automatically.", "error");
+        }
+      } catch (err) {
+        showNotification("Failed to copy snippet.", "error");
+      }
+      
+      document.body.removeChild(tempTextArea);
+    }
+
+    /**
+     * Elegant Non-intrusive alert notification alerts
+     */
+    function showNotification(msg, type = 'success') {
+      const hub = document.getElementById('notification-hub');
+      const item = document.createElement('div');
+      
+      let borderClass = 'border-slate-800 bg-slate-900/90 text-slate-100';
+      if (type === 'warning') borderClass = 'border-amber-500/20 bg-amber-950/80 text-amber-300';
+      if (type === 'error') borderClass = 'border-rose-500/20 bg-rose-950/80 text-rose-300';
+
+      item.className = `flex items-center space-x-2 px-4 py-3 rounded-xl border text-xs shadow-xl transition-all duration-300 transform translate-y-4 opacity-0 ${borderClass}`;
+      item.innerHTML = `
+        <span>${msg}</span>
+      `;
+      
+      hub.appendChild(item);
+      
+      // Animate entry
+      setTimeout(() => {
+        item.classList.remove('translate-y-4', 'opacity-0');
+      }, 50);
+
+      // Dismiss timer
+      setTimeout(() => {
+        item.classList.add('opacity-0', 'translate-y--4');
+        setTimeout(() => {
+          hub.removeChild(item);
+        }, 300);
+      }, 3000);
+    }
+
+    function showToast(msg) {
+      showNotification(msg, 'success');
+    }
+  </script>
+</body>
+</html>
