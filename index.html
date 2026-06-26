@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-[#050814] text-slate-100">
+<html lang="en" class="h-full bg-[#03050c] text-slate-100">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,7 +19,7 @@
               600: '#4f46e5',
               900: '#1e1b4b',
               accent: '#06b6d4',
-              bgDark: '#050814'
+              bgDark: '#03050c'
             },
             risk: {
               safe: '#10b981',      // Emerald
@@ -46,11 +46,19 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
+      background-color: #03050c;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(3, 5, 12, 0.5) 0px, transparent 85%);
+      background-attachment: fixed;
     }
     .glass-panel {
-      background: rgba(10, 15, 30, 0.7);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(10, 15, 30, 0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
     }
     .active-glow {
       position: relative;
@@ -68,7 +76,26 @@
     .gradient-border-glow:hover::after {
       opacity: 0.45;
     }
-    /* Hide scrollbars for slick look */
+    /* Dynamic Scanner Animation */
+    .scanner-line {
+      position: relative;
+      overflow: hidden;
+    }
+    .scanner-line::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.4), transparent);
+      animation: scan-anim 2s infinite linear;
+    }
+    @keyframes scan-anim {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    /* Hide scrollbars */
     .scrollbar-none::-webkit-scrollbar {
       display: none;
     }
@@ -76,37 +103,51 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* Custom Scrollbar for Chat & Card lists */
+    /* Custom Scrollbar */
     .custom-scroll::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
+      width: 6px;
+      height: 6px;
     }
     .custom-scroll::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.3);
+      background: rgba(15, 23, 42, 0.2);
     }
     .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(99, 102, 241, 0.2);
+      background: rgba(99, 102, 241, 0.25);
       border-radius: 99px;
     }
     .custom-scroll::-webkit-scrollbar-thumb:hover {
-      background: rgba(99, 102, 241, 0.4);
+      background: rgba(99, 102, 241, 0.45);
+    }
+    /* Smooth card entrance */
+    .animate-fade-in-up {
+      animation: fadeInUp 0.5s ease-out forwards;
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
-<body class="flex flex-col min-h-screen bg-[#050814] text-slate-100 antialiased">
+<body class="flex flex-col min-h-screen text-slate-100 antialiased">
 
   <!-- Premium Header -->
   <header class="glass-panel sticky top-0 z-40 border-b border-slate-900/60 px-6 py-4 flex items-center justify-between">
     <div class="flex items-center space-x-3.5">
-      <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-xl shadow-indigo-500/10">
-        <svg class="h-5.5 w-5.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="h-11 w-11 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-xl shadow-indigo-500/20 hover:scale-105 transition-all duration-300">
+        <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
         </svg>
       </div>
       <div>
         <div class="flex items-center space-x-2">
-          <h1 class="font-black text-xl tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">LegisShield AI</h1>
-          <span class="text-[9px] font-extrabold tracking-widest text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">v2.5</span>
+          <h1 class="font-extrabold text-2xl tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">LegisShield AI</h1>
+          <span class="text-[9px] font-black tracking-widest text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">v2.5</span>
         </div>
         <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">Enterprise Contract Intelligence System</p>
       </div>
@@ -114,9 +155,9 @@
     
     <!-- Connection Status Badges -->
     <div class="flex items-center space-x-3">
-      <div id="connection-indicator" class="flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900/60 border border-slate-800">
-        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" id="connection-dot"></span>
-        <span class="text-slate-300" id="connection-text">Fail-Safe AI Enabled</span>
+      <div id="connection-indicator" class="flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold bg-slate-955/60 border border-slate-800 shadow-inner">
+        <span class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" id="connection-dot"></span>
+        <span class="text-slate-300" id="connection-text">Direct Gemini AI Active</span>
       </div>
     </div>
   </header>
@@ -131,10 +172,10 @@
       <div class="glass-panel rounded-2xl p-6 flex flex-col space-y-5">
         <!-- Sub-Navigation Utility Tabs -->
         <div class="flex space-x-1 p-1 bg-slate-950/80 rounded-xl border border-slate-900 shrink-0">
-          <button id="utiltab-upload" onclick="switchUtilTab('upload')" class="flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all duration-200 bg-indigo-600 text-white shadow-md">
+          <button id="utiltab-upload" onclick="switchUtilTab('upload')" class="flex-1 text-center py-2.5 text-xs font-bold rounded-lg transition-all duration-300 bg-indigo-600 text-white shadow-md">
             1. Auditing Center
           </button>
-          <button id="utiltab-traps" onclick="switchUtilTab('traps')" class="flex-1 text-center py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-200">
+          <button id="utiltab-traps" onclick="switchUtilTab('traps')" class="flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-300">
             2. Trap Decoder
           </button>
         </div>
@@ -143,77 +184,83 @@
         <div id="utilpanel-upload" class="space-y-4">
           <div>
             <h2 class="text-base font-bold text-white flex items-center space-x-2">
-              <svg class="h-4.5 w-4.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="h-5 w-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
               <span>Audit Execution Terminal</span>
             </h2>
-            <p class="text-xs text-slate-400 mt-1">Upload a target legal agreement or paste terms below to audit operational exposures.</p>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Upload a target legal agreement or paste terms below to audit operational exposures.</p>
           </div>
 
           <!-- Input Switcher Tabs -->
-          <div class="flex p-0.5 bg-slate-950/60 rounded-lg border border-slate-900">
-            <button id="tab-upload" onclick="switchInputTab('upload')" class="flex-1 text-center py-1.5 text-[11px] font-bold rounded transition bg-indigo-600/80 text-white">
+          <div class="flex p-1 bg-slate-955/60 rounded-lg border border-slate-900/80">
+            <button id="tab-upload" onclick="switchInputTab('upload')" class="flex-1 text-center py-2 text-[11px] font-bold rounded transition bg-indigo-600/80 text-white shadow">
               File Dropzone
             </button>
-            <button id="tab-text" onclick="switchInputTab('text')" class="flex-1 text-center py-1.5 text-[11px] font-bold rounded text-slate-400 hover:text-slate-200 transition">
+            <button id="tab-text" onclick="switchInputTab('text')" class="flex-1 text-center py-2 text-[11px] font-bold rounded text-slate-400 hover:text-slate-200 transition">
               Paste Direct Text
             </button>
           </div>
 
           <!-- FILE DRAGZONE -->
           <div id="upload-container" class="space-y-4">
-            <div id="dropzone" class="border-2 border-dashed border-slate-800 hover:border-indigo-500/50 bg-slate-950/20 rounded-xl p-8 text-center cursor-pointer transition flex flex-col items-center justify-center group relative">
+            <div id="dropzone" class="border-2 border-dashed border-slate-855 hover:border-indigo-500/50 hover:bg-slate-950/40 bg-slate-950/20 rounded-xl p-8 text-center cursor-pointer transition flex flex-col items-center justify-center group relative shadow-inner">
               <input type="file" id="fileInput" accept=".pdf,.txt" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleFileSelect(event)">
               
               <div id="dropzone-prompt" class="space-y-3">
-                <div class="h-12 w-12 rounded-full bg-slate-900 flex items-center justify-center mx-auto group-hover:bg-indigo-950/40 group-hover:text-indigo-400 transition-colors">
-                  <svg class="h-6 w-6 text-slate-400 group-hover:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="h-14 w-14 rounded-full bg-slate-900 flex items-center justify-center mx-auto group-hover:bg-indigo-955/40 group-hover:text-indigo-400 transition-all duration-300 shadow">
+                  <svg class="h-7 w-7 text-slate-400 group-hover:text-indigo-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                   </svg>
                 </div>
                 <div>
-                  <p class="text-xs font-bold text-slate-200">Drag & drop your contract file</p>
+                  <p class="text-xs font-bold text-slate-200 group-hover:text-indigo-300 transition duration-300">Drag & drop your contract file</p>
                   <p class="text-[10px] text-slate-500 mt-1">PDF or TXT (Max size 10MB)</p>
                 </div>
               </div>
 
               <div id="file-info" class="hidden space-y-2">
-                <div class="h-12 w-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto">
-                  <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="h-14 w-14 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto shadow-md">
+                  <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                   </svg>
                 </div>
                 <p id="fileName" class="text-xs font-bold text-slate-200 truncate max-w-xs mx-auto"></p>
-                <button type="button" onclick="resetFileSelection(event)" class="text-[10px] text-rose-400 hover:text-rose-300 underline font-medium">Remove File</button>
+                <button type="button" onclick="resetFileSelection(event)" class="text-[10px] text-rose-400 hover:text-rose-300 underline font-semibold">Remove File</button>
               </div>
             </div>
           </div>
 
           <!-- PASTE TEXT AREA -->
           <div id="text-container" class="hidden">
-            <textarea id="contractTextInput" rows="8" placeholder="Paste the clauses, terms, or entire legal agreement text here..." class="w-full bg-slate-950/60 rounded-xl p-3 text-xs border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-300 placeholder-slate-600 outline-none transition custom-scroll"></textarea>
+            <textarea id="contractTextInput" rows="8" placeholder="Paste the clauses, terms, or entire legal agreement text here..." class="w-full bg-slate-950/60 rounded-xl p-3.5 text-xs border border-slate-850 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-300 placeholder-slate-600 outline-none transition custom-scroll shadow-inner"></textarea>
           </div>
 
           <!-- Sandbox Preloaded Scenarios -->
-          <div class="space-y-1.5">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Demo Sandbox Pre-loads</p>
+          <div class="space-y-2">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Demo Sandbox Pre-loads</p>
             <div class="grid grid-cols-2 gap-2">
-              <button onclick="loadSample('nda')" class="px-3 py-2 text-left rounded-lg bg-slate-900/60 hover:bg-indigo-950/20 border border-slate-800/80 hover:border-indigo-500/20 text-xs transition duration-150">
-                <p class="font-bold text-white">🔒 SaaS NDA</p>
-                <p class="text-[10px] text-slate-400 mt-0.5 truncate">Extremely high exposure</p>
+              <button onclick="loadSample('nda')" class="px-3.5 py-3 text-left rounded-xl bg-slate-900/40 hover:bg-indigo-950/20 border border-slate-850 hover:border-indigo-500/30 text-xs transition-all duration-200 hover:-translate-y-0.5 shadow-sm">
+                <p class="font-bold text-white flex items-center space-x-1">
+                  <span>🔒</span>
+                  <span>SaaS NDA</span>
+                </p>
+                <p class="text-[10px] text-slate-400 mt-1 truncate">Unilateral high liability</p>
               </button>
-              <button onclick="loadSample('saas')" class="px-3 py-2 text-left rounded-lg bg-slate-900/60 hover:bg-indigo-950/20 border border-slate-800/80 hover:border-indigo-500/20 text-xs transition duration-150">
-                <p class="font-bold text-white">☁️ Vendor Master Terms</p>
-                <p class="text-[10px] text-slate-400 mt-0.5 truncate">Auto-renewals & SLA limits</p>
+              <button onclick="loadSample('saas')" class="px-3.5 py-3 text-left rounded-xl bg-slate-900/40 hover:bg-indigo-955/20 border border-slate-850 hover:border-indigo-500/30 text-xs transition-all duration-200 hover:-translate-y-0.5 shadow-sm">
+                <p class="font-bold text-white flex items-center space-x-1">
+                  <span>☁️</span>
+                  <span>Vendor MSA</span>
+                </p>
+                <p class="text-[10px] text-slate-400 mt-1 truncate">Auto-renewals & SLA limits</p>
               </button>
             </div>
           </div>
 
-          <!-- PRIMARY CALL TO ACTION BUTTON -->
-          <button id="btn-audit" onclick="triggerAudit()" class="w-full relative active-glow bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/15 text-xs transition-all flex items-center justify-center space-x-2">
+          <!-- PRIMARY CALL TO ACTION BUTTON (Streamlined Compact Height Padding) -->
+          <button id="btn-audit" onclick="triggerAudit()" class="w-full relative active-glow bg-gradient-to-r from-indigo-600 via-indigo-750 to-indigo-600 hover:from-indigo-500 hover:to-indigo-600 text-white font-extrabold py-2.5 px-3.5 rounded-xl shadow-lg shadow-indigo-600/20 text-xs tracking-wider uppercase transition-all duration-300 hover:scale-[1.01] flex items-center justify-center space-x-2">
             <span>⚡ Generate Strategic Audit</span>
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
             </svg>
           </button>
@@ -223,18 +270,18 @@
         <div id="utilpanel-traps" class="hidden space-y-4">
           <div>
             <h2 class="text-base font-bold text-white flex items-center space-x-2">
-              <svg class="h-4.5 w-4.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="h-5 w-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
               </svg>
               <span>Plain English Trap Decoder</span>
             </h2>
-            <p class="text-xs text-slate-400 mt-1">Translate convoluted legal jargon into clear business risk implications instantly.</p>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Translate convoluted legal jargon into clear business risk implications instantly.</p>
           </div>
-          <textarea id="legaleseInput" rows="5" placeholder="Paste complex clause legalese here..." class="w-full bg-slate-950/60 rounded-xl p-3 text-xs border border-slate-800 focus:border-indigo-500 text-slate-300 placeholder-slate-600 outline-none transition custom-scroll"></textarea>
-          <button onclick="translateLegaleseToPlainEnglish()" class="w-full py-2.5 bg-indigo-600/80 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl transition flex items-center justify-center space-x-1.5 shadow-md">
+          <textarea id="legaleseInput" rows="5" placeholder="Paste complex clause legalese here..." class="w-full bg-slate-950/60 rounded-xl p-3.5 text-xs border border-slate-850 focus:border-indigo-500 text-slate-300 placeholder-slate-600 outline-none transition custom-scroll shadow-inner"></textarea>
+          <button onclick="translateLegaleseToPlainEnglish()" class="w-full py-3 bg-indigo-600/90 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center justify-center space-x-2">
             <span>✨ Explain The Trap</span>
           </button>
-          <div id="trap-explanation" class="hidden text-xs text-slate-300 leading-relaxed p-3 bg-slate-900/50 rounded-xl border border-indigo-500/10 italic select-text"></div>
+          <div id="trap-explanation" class="hidden text-xs text-slate-300 leading-relaxed p-4 bg-indigo-950/15 rounded-xl border border-indigo-500/20 italic select-text animate-fade-in-up shadow-sm"></div>
         </div>
       </div>
 
@@ -245,59 +292,63 @@
       
       <!-- EMPTY STATE -->
       <div id="state-empty" class="glass-panel rounded-2xl flex-grow flex flex-col items-center justify-center p-8 text-center border-dashed border-slate-800">
-        <div class="h-20 w-20 rounded-2xl bg-indigo-500/5 flex items-center justify-center border border-indigo-500/10 mb-6">
-          <svg class="h-10 w-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="h-24 w-24 rounded-3xl bg-indigo-500/5 flex items-center justify-center border border-indigo-500/10 mb-6 shadow-inner animate-pulse">
+          <svg class="h-12 w-12 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
           </svg>
         </div>
-        <h3 class="text-xl font-bold text-white">System Awaiting Document</h3>
+        <h3 class="text-2xl font-black text-white">System Awaiting Document</h3>
         <p class="text-sm text-slate-400 max-w-sm mx-auto mt-2 leading-relaxed">
           Upload a legal agreement or execute a pre-loaded sandbox scenario to run structured risk audits instantly.
         </p>
-        <button onclick="loadSample('nda')" class="mt-6 inline-flex items-center space-x-2 px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/10 transition">
+        <button onclick="loadSample('nda')" class="mt-6 inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-bold rounded-xl bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40 transition duration-350 hover:-translate-y-0.5 shadow-sm">
           <span>Run Immediate Demo Analysis</span>
-          <span>→</span>
+          <span class="text-indigo-400">→</span>
         </button>
       </div>
 
       <!-- LOADING STATE -->
-      <div id="state-loading" class="hidden glass-panel rounded-2xl flex-grow flex flex-col items-center justify-center p-8 text-center">
-        <div class="relative h-16 w-16 mb-6">
+      <div id="state-loading" class="hidden glass-panel rounded-2xl flex-grow flex flex-col items-center justify-center p-8 text-center scanner-line">
+        <div class="relative h-20 w-20 mb-6 flex items-center justify-center">
           <div class="absolute inset-0 rounded-full border-4 border-indigo-500/10"></div>
           <div class="absolute inset-0 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
+          <!-- Scanning target symbol -->
+          <svg class="h-8 w-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m0 11v1m8-6h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707-.707m0-12.728l.707.707m12.728 12.728l-.707-.707"></path>
+          </svg>
         </div>
-        <h3 class="text-lg font-bold text-white mb-2" id="loader-title">Extracting Document Data</h3>
-        <p class="text-sm text-slate-400 max-w-sm mx-auto animate-pulse" id="loader-status">Parsing contract structure and locating key signatures...</p>
+        <h3 class="text-xl font-black text-white mb-2" id="loader-title">Extracting Document Data</h3>
+        <p class="text-xs text-indigo-400/80 max-w-sm mx-auto tracking-wide font-semibold uppercase animate-pulse" id="loader-status">Parsing contract structure and locating key signatures...</p>
         
         <!-- Live steps list -->
-        <div class="mt-8 w-full max-w-xs space-y-3 text-left border-t border-slate-800 pt-6">
+        <div class="mt-8 w-full max-w-xs space-y-3.5 text-left border-t border-slate-900 pt-6">
           <div class="flex items-center space-x-3 text-xs" id="step-1">
-            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-indigo-500/20 text-indigo-400 font-bold" id="dot-step-1">1</span>
-            <span class="text-slate-300" id="text-step-1">File extraction & buffer conversion</span>
+            <span class="h-6 w-6 rounded-full flex items-center justify-center bg-indigo-500/20 text-indigo-400 font-extrabold text-[10px]" id="dot-step-1">1</span>
+            <span class="text-slate-300 font-medium" id="text-step-1">File extraction & buffer conversion</span>
           </div>
           <div class="flex items-center space-x-3 text-xs opacity-40" id="step-2">
-            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold" id="dot-step-2">2</span>
-            <span class="text-slate-400" id="text-step-2">AI structure profiling & risk grading</span>
+            <span class="h-6 w-6 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-extrabold text-[10px]" id="dot-step-2">2</span>
+            <span class="text-slate-400 font-medium" id="text-step-2">AI structure profiling & risk grading</span>
           </div>
           <div class="flex items-center space-x-3 text-xs opacity-40" id="step-3">
-            <span class="h-5 w-5 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-bold" id="dot-step-3">3</span>
-            <span class="text-slate-400" id="text-step-3">Structured audit output formatting</span>
+            <span class="h-6 w-6 rounded-full flex items-center justify-center bg-slate-800 text-slate-400 font-extrabold text-[10px]" id="dot-step-3">3</span>
+            <span class="text-slate-400 font-medium" id="text-step-3">Structured audit output formatting</span>
           </div>
         </div>
       </div>
 
       <!-- MAIN RESULTS DASHBOARD -->
-      <div id="state-results" class="hidden flex-col space-y-6">
+      <div id="state-results" class="hidden flex-col space-y-6 animate-fade-in-up">
         
         <!-- TOP META CARD (Contract Type & Risk Ring Indicator) -->
-        <div class="glass-panel rounded-2xl p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div class="glass-panel rounded-2xl p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center shadow-lg">
           
           <!-- Radial Score Ring -->
-          <div class="md:col-span-4 flex flex-col items-center border-b md:border-b-0 md:border-r border-slate-800/80 pb-6 md:pb-0 md:pr-6">
-            <div class="relative h-32 w-32 flex items-center justify-center">
+          <div class="md:col-span-4 flex flex-col items-center border-b md:border-b-0 md:border-r border-slate-900 pb-6 md:pb-0 md:pr-6 relative">
+            <div class="relative h-36 w-36 flex items-center justify-center">
               <svg class="absolute inset-0 transform -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" stroke="rgba(30, 41, 59, 1)" stroke-width="8" fill="none"></circle>
-                <circle id="score-ring" cx="50" cy="50" r="40" stroke="url(#gradient-accent)" stroke-width="8" stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" fill="none" class="transition-all duration-1000 ease-out"></circle>
+                <circle cx="50" cy="50" r="41" stroke="rgba(15, 23, 42, 0.9)" stroke-width="8" fill="none"></circle>
+                <circle id="score-ring" cx="50" cy="50" r="41" stroke="url(#gradient-accent)" stroke-width="8" stroke-dasharray="257.6" stroke-dashoffset="257.6" stroke-linecap="round" fill="none" class="transition-all duration-1000 ease-out"></circle>
                 
                 <defs>
                   <linearGradient id="gradient-accent" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -306,79 +357,81 @@
                   </linearGradient>
                 </defs>
               </svg>
-              <div class="text-center">
-                <span class="block text-3xl font-extrabold text-white" id="score-text">0</span>
-                <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Risk Index</span>
+              <!-- Outer glowing grid -->
+              <div class="absolute inset-2 border border-indigo-500/10 rounded-full"></div>
+              <div class="text-center z-10">
+                <span class="block text-4xl font-black text-white tracking-tighter" id="score-text">0</span>
+                <span class="text-[9px] uppercase tracking-widest text-indigo-400/80 font-bold">Risk Index</span>
               </div>
             </div>
-            <div class="mt-4 px-3 py-1 rounded-full text-xs font-semibold" id="risk-badge">
+            <div class="mt-4 px-3.5 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase shadow-sm" id="risk-badge">
               HIGH RISK
             </div>
           </div>
 
           <!-- Document details & executive summary -->
-          <div class="md:col-span-8 space-y-3">
+          <div class="md:col-span-8 space-y-3.5">
             <div class="flex items-center space-x-2">
-              <span class="text-[10px] tracking-wider uppercase bg-indigo-500/10 text-indigo-300 font-bold px-2.5 py-1 rounded-lg border border-indigo-500/15" id="res-contractType">
+              <span class="text-[9px] tracking-widest uppercase bg-indigo-500/10 text-indigo-300 font-extrabold px-3 py-1 rounded-lg border border-indigo-500/15 shadow-sm" id="res-contractType">
                 NDA
               </span>
-              <span class="text-xs text-slate-400">• Dynamic Audit Complete</span>
+              <span class="text-xs text-slate-400 font-medium">• Dynamic Audit Complete</span>
             </div>
-            <h3 class="text-xl font-bold text-white">General Counsel Audit Summary</h3>
-            <p class="text-xs text-slate-300 leading-relaxed italic border-l-2 border-indigo-500 pl-3" id="res-summary">
+            <h3 class="text-2xl font-extrabold text-white tracking-tight">General Counsel Audit Summary</h3>
+            <p class="text-xs text-slate-300 leading-relaxed italic border-l-2 border-indigo-500 pl-4 py-1" id="res-summary">
               Analyzing terms reveals high exposure to indefinite liability streams. A restructuring of standard redline conditions is highly encouraged.
             </p>
           </div>
         </div>
 
         <!-- DYNAMIC AI DEAL MATRIX BOARD -->
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-3 gap-3.5">
           <!-- Metric 1: Liability profile -->
-          <div class="glass-panel p-3.5 rounded-xl border border-slate-850 space-y-1">
-            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">Liability Burden</span>
+          <div class="glass-panel p-4 rounded-xl border border-slate-900 space-y-1.5 shadow-sm hover:border-indigo-500/20 transition-all duration-300">
+            <span class="text-[10px] uppercase tracking-widest text-slate-455 font-extrabold block">Liability Burden</span>
             <span id="metric-liability" class="text-[11px] font-bold text-slate-200">Analyzing...</span>
-            <div class="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden mt-1">
-              <div id="bar-liability" class="h-full bg-indigo-500 rounded-full transition-all duration-1000" style="width: 0%"></div>
+            <div class="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden mt-2">
+              <div id="bar-liability" class="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full transition-all duration-1000" style="width: 0%"></div>
             </div>
           </div>
           <!-- Metric 2: IP Safegard -->
-          <div class="glass-panel p-3.5 rounded-xl border border-slate-850 space-y-1">
-            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">IP Safety Rating</span>
-            <span id="metric-ip" class="text-[11px] font-bold text-slate-200">Analyzing...</span>
-            <div class="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden mt-1">
-              <div id="bar-ip" class="h-full bg-cyan-500 rounded-full transition-all duration-1000" style="width: 0%"></div>
+          <div class="glass-panel p-4 rounded-xl border border-slate-900 space-y-1.5 shadow-sm hover:border-cyan-500/20 transition-all duration-300">
+            <span class="text-[10px] uppercase tracking-widest text-slate-455 font-extrabold block">IP Safety Rating</span>
+            <span id="metric-ip" class="text-sm font-black text-slate-100">Analyzing...</span>
+            <div class="h-1.5 w-full bg-slate-955 rounded-full overflow-hidden mt-2">
+              <div id="bar-ip" class="h-full bg-gradient-to-r from-cyan-400 to-cyan-500 rounded-full transition-all duration-1000" style="width: 0%"></div>
             </div>
           </div>
           <!-- Metric 3: Dispute sovereignty -->
-          <div class="glass-panel p-3.5 rounded-xl border border-slate-850 space-y-1">
-            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-bold block">Dispute Sovereignty</span>
-            <span id="metric-jurisdiction" class="text-[11px] font-bold text-slate-200">Analyzing...</span>
-            <div class="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden mt-1">
-              <div id="bar-jurisdiction" class="h-full bg-emerald-500 rounded-full transition-all duration-1000" style="width: 0%"></div>
+          <div class="glass-panel p-4 rounded-xl border border-slate-900 space-y-1.5 shadow-sm hover:border-emerald-500/20 transition-all duration-300">
+            <span class="text-[10px] uppercase tracking-widest text-slate-455 font-extrabold block">Dispute Sovereignty</span>
+            <span id="metric-jurisdiction" class="text-sm font-black text-slate-100">Analyzing...</span>
+            <div class="h-1.5 w-full bg-slate-955 rounded-full overflow-hidden mt-2">
+              <div id="bar-jurisdiction" class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-1000" style="width: 0%"></div>
             </div>
           </div>
         </div>
 
         <!-- ANALYSIS NAVIGATION TABS -->
-        <div class="grid grid-cols-3 sm:grid-cols-6 gap-1 p-1 bg-slate-950/80 rounded-xl border border-slate-900 shrink-0">
-          <button id="subtab-risks" onclick="switchResultSubtab('risks')" class="text-center py-2 text-[10px] font-bold rounded-lg transition-all duration-150 bg-indigo-600 text-white flex items-center justify-center space-x-0.5">
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-1 p-1 bg-slate-955/80 rounded-xl border border-slate-900 shrink-0 shadow-inner">
+          <button id="subtab-risks" onclick="switchResultSubtab('risks')" class="text-center py-2.5 text-[10px] font-bold rounded-lg transition-all duration-150 bg-indigo-600 text-white flex items-center justify-center space-x-1 shadow-md">
             <span>Redlines</span>
-            <span class="bg-slate-950/40 text-slate-200 px-1 rounded text-[8px] font-bold" id="badge-count-risks">0</span>
+            <span class="bg-slate-950/45 text-slate-200 px-1.5 py-0.5 rounded text-[8px] font-black" id="badge-count-risks">0</span>
           </button>
-          <button id="subtab-missing" onclick="switchResultSubtab('missing')" class="text-center py-2 text-[10px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-150 flex items-center justify-center space-x-0.5">
+          <button id="subtab-missing" onclick="switchResultSubtab('missing')" class="text-center py-2.5 text-[10px] font-bold rounded-lg text-slate-450 hover:text-slate-200 transition-all duration-150 flex items-center justify-center space-x-1">
             <span>Missing</span>
-            <span class="bg-slate-950/40 text-slate-400 px-1 rounded text-[8px] font-bold" id="badge-count-missing">0</span>
+            <span class="bg-slate-950/45 text-slate-450 px-1.5 py-0.5 rounded text-[8px] font-black" id="badge-count-missing">0</span>
           </button>
-          <button id="subtab-brief" onclick="switchResultSubtab('brief')" class="text-center py-2 text-[10px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-150 flex items-center justify-center">
+          <button id="subtab-brief" onclick="switchResultSubtab('brief')" class="text-center py-2.5 text-[10px] font-bold rounded-lg text-slate-450 hover:text-slate-200 transition-all duration-150 flex items-center justify-center">
             <span>✨ Negotiation</span>
           </button>
-          <button id="subtab-chat" onclick="switchResultSubtab('chat')" class="text-center py-2 text-[10px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-150 flex items-center justify-center">
+          <button id="subtab-chat" onclick="switchResultSubtab('chat')" class="text-center py-2.5 text-[10px] font-bold rounded-lg text-slate-450 hover:text-slate-200 transition-all duration-150 flex items-center justify-center">
             <span>✨ Copilot</span>
           </button>
-          <button id="subtab-compliance" onclick="switchResultSubtab('compliance')" class="text-center py-2 text-[10px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-150 flex items-center justify-center">
+          <button id="subtab-compliance" onclick="switchResultSubtab('compliance')" class="text-center py-2.5 text-[10px] font-bold rounded-lg text-slate-450 hover:text-slate-200 transition-all duration-150 flex items-center justify-center">
             <span>✨ Compliance</span>
           </button>
-          <button id="subtab-board" onclick="switchResultSubtab('board')" class="text-center py-2 text-[10px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-150 flex items-center justify-center">
+          <button id="subtab-board" onclick="switchResultSubtab('board')" class="text-center py-2.5 text-[10px] font-bold rounded-lg text-slate-450 hover:text-slate-200 transition-all duration-150 flex items-center justify-center">
             <span>✨ Board Deck</span>
           </button>
         </div>
@@ -387,12 +440,12 @@
         <div id="panel-risks" class="space-y-4">
           <!-- Severity Filter Bar -->
           <div class="flex items-center justify-between">
-            <p class="text-xs text-slate-400 font-medium">Filter Redlines by Severity:</p>
-            <div class="flex items-center space-x-2">
-              <button id="filter-all" onclick="filterRisks('ALL')" class="px-2.5 py-1 rounded bg-indigo-600 text-[10px] font-semibold text-white transition hover:bg-indigo-500">All</button>
-              <button id="filter-high" onclick="filterRisks('HIGH')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-rose-400 border border-rose-900/30 hover:bg-slate-800 transition">High</button>
-              <button id="filter-medium" onclick="filterRisks('MEDIUM')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-amber-400 border border-amber-900/30 hover:bg-slate-800 transition">Medium</button>
-              <button id="filter-low" onclick="filterRisks('LOW')" class="px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-blue-400 border border-blue-900/30 hover:bg-slate-800 transition">Low</button>
+            <p class="text-xs text-slate-400 font-semibold tracking-wide">Filter Redlines by Severity:</p>
+            <div class="flex items-center space-x-1.5">
+              <button id="filter-all" onclick="filterRisks('ALL')" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-[10px] font-extrabold text-white transition hover:bg-indigo-500 shadow-sm">All</button>
+              <button id="filter-high" onclick="filterRisks('HIGH')" class="px-3 py-1.5 rounded-lg bg-slate-900/60 text-[10px] font-extrabold text-rose-400 border border-rose-955/40 hover:bg-slate-800 transition">High</button>
+              <button id="filter-medium" onclick="filterRisks('MEDIUM')" class="px-3 py-1.5 rounded-lg bg-slate-900/60 text-[10px] font-extrabold text-amber-400 border border-amber-955/40 hover:bg-slate-800 transition">Medium</button>
+              <button id="filter-low" onclick="filterRisks('LOW')" class="px-3 py-1.5 rounded-lg bg-slate-900/60 text-[10px] font-extrabold text-blue-400 border border-blue-955/40 hover:bg-slate-800 transition">Low</button>
             </div>
           </div>
 
@@ -411,37 +464,37 @@
 
         <!-- STRATEGIC NEGOTIATION BRIEF PANEL -->
         <div id="panel-brief" class="hidden space-y-4">
-          <div class="glass-panel rounded-xl p-5 border border-slate-800 space-y-4">
+          <div class="glass-panel rounded-xl p-5 border border-slate-900 space-y-4">
             <div class="flex items-center justify-between">
               <div>
                 <h4 class="text-sm font-bold text-white">✨ Tactical Negotiation Briefing</h4>
-                <p class="text-[11px] text-slate-400">Synthesize the legal risks into high-impact talking points and draft correspondence.</p>
+                <p class="text-[11px] text-slate-400 leading-relaxed">Synthesize the legal risks into high-impact talking points and draft correspondence.</p>
               </div>
-              <button onclick="generateNegotiationBrief()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold text-white transition flex items-center space-x-1 shadow-md">
+              <button onclick="generateNegotiationBrief()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-bold text-white transition flex items-center space-x-1.5 shadow-md hover:-translate-y-0.5">
                 <span>✨ Build Brief</span>
               </button>
             </div>
 
             <!-- Loading overlay for Brief Generator -->
             <div id="brief-loading" class="hidden flex-col items-center justify-center py-12 space-y-3">
-              <div class="h-8 w-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin"></div>
-              <p class="text-xs text-indigo-400">Master negotiator constructing talking points...</p>
+              <div class="h-9 w-9 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin"></div>
+              <p class="text-xs text-indigo-400/90 font-bold uppercase tracking-wider">Master negotiator constructing talking points...</p>
             </div>
 
             <!-- Brief Render Destination -->
-            <div id="brief-content" class="space-y-5 hidden">
+            <div id="brief-content" class="space-y-5 hidden animate-fade-in-up">
               <!-- Strategic Posture & Leverage Gauge -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="p-3.5 bg-indigo-950/20 rounded-xl border border-indigo-500/10">
-                  <span class="text-[10px] uppercase font-bold text-indigo-300 tracking-wider">Strategic Posture</span>
-                  <p id="brief-posture" class="text-xs text-slate-200 mt-1.5 leading-relaxed"></p>
+                <div class="p-4 bg-indigo-950/20 rounded-xl border border-indigo-500/10">
+                  <span class="text-[10px] uppercase font-black text-indigo-300 tracking-widest block">Strategic Posture</span>
+                  <p id="brief-posture" class="text-xs text-slate-200 mt-2 leading-relaxed font-semibold"></p>
                 </div>
-                <div class="p-3.5 bg-cyan-950/20 rounded-xl border border-cyan-500/10 flex flex-col justify-between">
+                <div class="p-4 bg-cyan-955/20 rounded-xl border border-cyan-500/10 flex flex-col justify-between">
                   <div>
-                    <span class="text-[10px] uppercase font-bold text-cyan-300 tracking-wider block">Bargaining Leverage Rating</span>
-                    <span id="brief-leverage-rating" class="text-xs font-bold text-slate-200 mt-1.5 block">Analyzing...</span>
+                    <span class="text-[10px] uppercase font-black text-cyan-300 tracking-widest block">Bargaining Leverage Rating</span>
+                    <span id="brief-leverage-rating" class="text-xs font-black text-slate-100 mt-2 block">Analyzing...</span>
                   </div>
-                  <div class="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden mt-2">
+                  <div class="h-2 w-full bg-slate-950 rounded-full overflow-hidden mt-2">
                     <div id="brief-leverage-bar" class="h-full bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-full transition-all duration-1000" style="width: 50%"></div>
                   </div>
                 </div>
@@ -449,19 +502,19 @@
 
               <!-- Top Leverage Points -->
               <div class="space-y-2">
-                <span class="text-[10px] uppercase font-bold text-indigo-300 block tracking-wider">Bargaining Chips & Justifications</span>
+                <span class="text-[10px] uppercase font-black text-indigo-300 block tracking-widest">Bargaining Chips & Justifications</span>
                 <div id="brief-leverage-container" class="grid grid-cols-1 gap-2.5">
                   <!-- JS Injected chip panels -->
                 </div>
               </div>
 
               <!-- Email Draft -->
-              <div class="space-y-2 relative">
-                <span class="text-[10px] uppercase font-bold text-emerald-400 block tracking-wider">Counter-Proposal Draft Email</span>
-                <div class="bg-slate-950/40 rounded-xl p-3.5 border border-slate-800 relative">
+              <div class="space-y-2.5 relative">
+                <span class="text-[10px] uppercase font-black text-emerald-400 block tracking-widest">Counter-Proposal Draft Email</span>
+                <div class="bg-slate-955/70 rounded-xl p-4 border border-slate-900 relative">
                   <pre id="brief-email" class="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed select-all overflow-x-auto custom-scroll max-h-72"></pre>
-                  <button id="btn-copy-email" onclick="copyNegotiationText('brief-email', 'btn-copy-email')" class="absolute top-3.5 right-3 text-slate-400 hover:text-white transition flex items-center space-x-1.5 text-[10px] bg-slate-900/90 px-2.5 py-1.5 rounded-lg border border-slate-800" title="Copy email draft to clipboard">
-                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <button id="btn-copy-email" onclick="copyNegotiationText('brief-email', 'btn-copy-email')" class="absolute top-4 right-4 text-slate-300 hover:text-white transition flex items-center space-x-1.5 text-[10px] bg-slate-900/95 px-3 py-2 rounded-lg border border-slate-800 shadow-md hover:border-indigo-500/30" title="Copy email draft to clipboard">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                     </svg>
                     <span class="btn-text">Copy Draft</span>
@@ -471,27 +524,27 @@
             </div>
             
             <div id="brief-placeholder" class="text-center py-8">
-              <p class="text-xs text-slate-500">Click "Build Brief" to analyze terms and generate a negotiation guide.</p>
+              <p class="text-xs text-slate-500 font-medium">Click "Build Brief" to analyze terms and generate a negotiation guide.</p>
             </div>
           </div>
         </div>
 
         <!-- CLAUSE CHATBOT PANEL -->
         <div id="panel-chat" class="hidden space-y-4">
-          <div class="glass-panel rounded-xl p-5 border border-slate-800 flex flex-col h-[480px]">
+          <div class="glass-panel rounded-xl p-5 border border-slate-900 flex flex-col h-[480px] shadow-lg">
             <!-- Header -->
-            <div class="border-b border-slate-800 pb-3">
+            <div class="border-b border-slate-900 pb-3">
               <h4 class="text-sm font-bold text-white">✨ Interactive Contract Copilot</h4>
-              <p class="text-[11px] text-slate-400">Ask questions, locate specific provisions, or ask the Copilot to draft protective revisions.</p>
+              <p class="text-[11px] text-slate-400 leading-relaxed">Ask questions, locate specific provisions, or ask the Copilot to draft protective revisions.</p>
             </div>
 
             <!-- Messages Stream -->
             <div id="chat-messages" class="flex-grow overflow-y-auto my-4 space-y-4 pr-1 custom-scroll">
               <div class="flex items-start space-x-2.5">
-                <div class="h-7 w-7 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">
+                <div class="h-8 w-8 rounded-lg bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-black shrink-0 shadow-sm">
                   AI
                 </div>
-                <div class="bg-slate-900/40 rounded-xl p-3 border border-slate-850 text-xs text-slate-200 leading-relaxed max-w-[85%]">
+                <div class="bg-slate-900/50 rounded-xl p-3.5 border border-slate-850 text-xs text-slate-200 leading-relaxed max-w-[85%] shadow-sm">
                   Greetings, Negotiator. I am grounded in your contract specifications and audit layout. Ask me to modify any clause, verify regulatory exposure, or scan for hidden terms.
                 </div>
               </div>
@@ -499,26 +552,26 @@
 
             <!-- Suggestion chips -->
             <div class="flex items-center space-x-2 overflow-x-auto pb-2 shrink-0 select-none scrollbar-none">
-              <button onclick="injectPrompt('Is this contract unilateral or mutual?')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:bg-slate-900 hover:text-indigo-300 text-[10px] text-slate-400 font-medium transition-all">
+              <button onclick="injectPrompt('Is this contract unilateral or mutual?')" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-900 hover:bg-slate-900 hover:text-indigo-300 text-[10px] text-slate-400 font-bold transition-all hover:border-indigo-500/30">
                 ⚖️ Is this mutual?
               </button>
-              <button onclick="injectPrompt('Highlight governing law and governing dispute clauses.')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:bg-slate-900 hover:text-indigo-300 text-[10px] text-slate-400 font-medium transition-all">
+              <button onclick="injectPrompt('Highlight governing law and governing dispute clauses.')" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-955 border border-slate-900 hover:bg-slate-900 hover:text-indigo-300 text-[10px] text-slate-400 font-bold transition-all hover:border-indigo-500/30">
                 🗺️ Dispute Venue
               </button>
-              <button onclick="injectPrompt('Explain the Intellectual Property implications.')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:bg-slate-900 hover:text-indigo-300 text-[10px] text-slate-400 font-medium transition-all">
+              <button onclick="injectPrompt('Explain the Intellectual Property implications.')" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-955 border border-slate-900 hover:bg-slate-905 hover:text-indigo-300 text-[10px] text-slate-400 font-bold transition-all hover:border-indigo-500/30">
                 💡 IP implications
               </button>
-              <button onclick="injectPrompt('Check if there is a solicitation or non-compete loop.')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:bg-slate-900 hover:text-indigo-300 text-[10px] text-slate-400 font-medium transition-all">
+              <button onclick="injectPrompt('Check if there is a solicitation or non-compete loop.')" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-955 border border-slate-900 hover:bg-slate-905 hover:text-indigo-300 text-[10px] text-slate-400 font-bold transition-all hover:border-indigo-500/30">
                 🔒 Non-solicit loop?
               </button>
             </div>
 
             <!-- Chat input -->
-            <div class="flex items-center space-x-2 border-t border-slate-850 pt-3 shrink-0">
-              <input type="text" id="chat-input" onkeydown="handleChatKeyDown(event)" placeholder="Ask the copilot anything about this contract..." class="flex-grow bg-slate-950/60 rounded-xl px-3.5 py-2.5 text-xs border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-300 outline-none transition">
-              <button onclick="sendChatMessage()" class="p-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center justify-center">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            <div class="flex items-center space-x-2 border-t border-slate-900 pt-3.5 shrink-0">
+              <input type="text" id="chat-input" onkeydown="handleChatKeyDown(event)" placeholder="Ask the copilot anything about this contract..." class="flex-grow bg-slate-950/60 rounded-xl px-4 py-3 text-xs border border-slate-850 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-200 outline-none transition shadow-inner">
+              <button onclick="sendChatMessage()" class="p-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all shadow flex items-center justify-center">
+                <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                 </svg>
               </button>
             </div>
@@ -527,87 +580,87 @@
 
         <!-- NEW VALUE-ADD PANEL: ✨ REGULATORY COMPLIANCE AUDITOR -->
         <div id="panel-compliance" class="hidden space-y-4">
-          <div class="glass-panel rounded-xl p-5 border border-slate-800 space-y-4">
+          <div class="glass-panel rounded-xl p-5 border border-slate-900 space-y-4">
             <div class="flex items-center justify-between">
               <div>
                 <h4 class="text-sm font-bold text-white">✨ Regulatory Compliance Scanner</h4>
-                <p class="text-[11px] text-slate-400">Deep check against global ISO 27001, SOC2, GDPR, and data protection rules.</p>
+                <p class="text-[11px] text-slate-400 leading-relaxed">Deep check against global ISO 27001, SOC2, GDPR, and data protection rules.</p>
               </div>
-              <button onclick="auditRegulatoryCompliance()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold text-white transition flex items-center space-x-1 shadow-md">
+              <button onclick="auditRegulatoryCompliance()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-bold text-white transition flex items-center space-x-1.5 shadow-md hover:-translate-y-0.5">
                 <span>✨ Run Compliance Scan</span>
               </button>
             </div>
 
             <!-- Loading overlay for Compliance Scanner -->
             <div id="compliance-loading" class="hidden flex-col items-center justify-center py-12 space-y-3">
-              <div class="h-8 w-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin"></div>
-              <p class="text-xs text-indigo-400">Verifying structural terms against ISO & GDPR parameters...</p>
+              <div class="h-9 w-9 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin"></div>
+              <p class="text-xs text-indigo-400/90 font-bold uppercase tracking-wider">Verifying structural terms against ISO & GDPR parameters...</p>
             </div>
 
             <!-- Compliance Content Renders Here -->
-            <div id="compliance-content" class="space-y-4 hidden">
+            <div id="compliance-content" class="space-y-4 hidden animate-fade-in-up">
               <!-- GDPR Status -->
-              <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-850 space-y-2">
+              <div class="p-4 bg-slate-900/30 rounded-xl border border-slate-850 hover:border-slate-800 transition-all duration-200 space-y-2.5">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-white uppercase tracking-wider">GDPR & Data Protection Status</span>
-                  <span id="gdpr-status-badge" class="px-2 py-0.5 rounded text-[10px] font-bold"></span>
+                  <span class="text-xs font-black text-slate-200 uppercase tracking-widest">GDPR & Data Protection Status</span>
+                  <span id="gdpr-status-badge" class="px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wider"></span>
                 </div>
-                <p id="gdpr-explanation" class="text-xs text-slate-300 leading-relaxed"></p>
+                <p id="gdpr-explanation" class="text-xs text-slate-350 leading-relaxed"></p>
               </div>
 
               <!-- Security Standards Status -->
-              <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-850 space-y-2">
+              <div class="p-4 bg-slate-900/30 rounded-xl border border-slate-855 hover:border-slate-800 transition-all duration-200 space-y-2.5">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-white uppercase tracking-wider">SOC2 & ISO 27001 Security Audit</span>
-                  <span id="security-status-badge" class="px-2 py-0.5 rounded text-[10px] font-bold"></span>
+                  <span class="text-xs font-black text-slate-200 uppercase tracking-widest">SOC2 & ISO 27001 Security Audit</span>
+                  <span id="security-status-badge" class="px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wider"></span>
                 </div>
-                <p id="security-explanation" class="text-xs text-slate-300 leading-relaxed"></p>
+                <p id="security-explanation" class="text-xs text-slate-355 leading-relaxed"></p>
               </div>
 
               <!-- Liability Cap Compliance -->
-              <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-850 space-y-2">
+              <div class="p-4 bg-slate-900/30 rounded-xl border border-slate-855 hover:border-slate-800 transition-all duration-200 space-y-2.5">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-white uppercase tracking-wider">Liability Cap Exposure Check</span>
-                  <span id="liability-status-badge" class="px-2 py-0.5 rounded text-[10px] font-bold"></span>
+                  <span class="text-xs font-black text-slate-200 uppercase tracking-widest">Liability Cap Exposure Check</span>
+                  <span id="liability-status-badge" class="px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wider"></span>
                 </div>
-                <p id="liability-explanation" class="text-xs text-slate-300 leading-relaxed"></p>
+                <p id="liability-explanation" class="text-xs text-slate-355 leading-relaxed"></p>
               </div>
             </div>
 
             <div id="compliance-placeholder" class="text-center py-8">
-              <p class="text-xs text-slate-500">Click "Run Compliance Scan" to execute standard regulatory reviews.</p>
+              <p class="text-xs text-slate-500 font-medium">Click "Run Compliance Scan" to execute standard regulatory reviews.</p>
             </div>
           </div>
         </div>
 
         <!-- NEW VALUE-ADD PANEL: ✨ EXECUTIVE BOARD PRESENTATION GENERATOR -->
         <div id="panel-board" class="hidden space-y-4">
-          <div class="glass-panel rounded-xl p-5 border border-slate-800 space-y-4">
+          <div class="glass-panel rounded-xl p-5 border border-slate-900 space-y-4">
             <div class="flex items-center justify-between">
               <div>
                 <h4 class="text-sm font-bold text-white">✨ Executive Board Presentation Generator</h4>
-                <p class="text-[11px] text-slate-400">Prepare structured, high-impact overview slides to present this transaction to internal stakeholders.</p>
+                <p class="text-[11px] text-slate-400 leading-relaxed">Prepare structured, high-impact overview slides to present this transaction to internal stakeholders.</p>
               </div>
-              <button onclick="generateBoardPresentation()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold text-white transition flex items-center space-x-1 shadow-md">
+              <button onclick="generateBoardPresentation()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-bold text-white transition flex items-center space-x-1.5 shadow-md hover:-translate-y-0.5">
                 <span>✨ Build Slide Deck</span>
               </button>
             </div>
 
             <!-- Loading overlay for Presentation Builder -->
             <div id="board-loading" class="hidden flex-col items-center justify-center py-12 space-y-3">
-              <div class="h-8 w-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin"></div>
-              <p class="text-xs text-indigo-400">Drafting stakeholder presentation slide structures...</p>
+              <div class="h-9 w-9 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin"></div>
+              <p class="text-xs text-indigo-400/90 font-bold uppercase tracking-wider">Drafting stakeholder presentation slide structures...</p>
             </div>
 
             <!-- Presentation Content destination -->
-            <div id="board-content" class="space-y-4 hidden flex flex-col">
+            <div id="board-content" class="space-y-4 hidden flex flex-col animate-fade-in-up">
               <div id="slides-container" class="grid grid-cols-1 gap-4">
                 <!-- Injected via JS -->
               </div>
             </div>
 
             <div id="board-placeholder" class="text-center py-8">
-              <p class="text-xs text-slate-500">Click "Build Slide Deck" to draft C-level presentation structures.</p>
+              <p class="text-xs text-slate-500 font-medium">Click "Build Slide Deck" to draft C-level presentation structures.</p>
             </div>
           </div>
         </div>
@@ -618,10 +671,10 @@
   </main>
 
   <!-- Subtle Footer with Hidden Admin/Developer Trigger -->
-  <footer class="mt-auto py-4 border-t border-slate-900/60 text-center text-xs text-slate-500 flex items-center justify-between px-6 shrink-0">
+  <footer class="mt-auto py-5 border-t border-slate-900/60 text-center text-xs text-slate-500 flex items-center justify-between px-6 shrink-0 bg-slate-950/20 backdrop-blur">
     <p>© 2026 LegisShield AI. All rights reserved.</p>
-    <button onclick="openAdminConsole()" class="text-slate-600 hover:text-indigo-400 transition flex items-center space-x-1">
-      <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button onclick="openAdminConsole()" class="text-slate-500 hover:text-indigo-400 transition flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-slate-900/40 border border-slate-850 hover:border-indigo-500/20 shadow-sm text-[11px] font-semibold">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
       </svg>
       <span>Developer Console</span>
@@ -631,23 +684,23 @@
   <!-- Notification Feed for actions inside sandbox -->
   <div id="notification-hub" class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
-  <!-- Custom Alert Modal (Zero window.alert replacement) -->
-  <div id="custom-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
-      <div class="h-12 w-12 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center mb-4">
-        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <!-- Custom Alert Modal -->
+  <div id="custom-modal" class="fixed inset-0 z-50 hidden bg-slate-955/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl relative border border-slate-800 animate-fade-in-up">
+      <div class="h-14 w-14 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center mb-4 border border-rose-500/20">
+        <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
         </svg>
       </div>
-      <h4 class="text-lg font-bold text-white" id="modal-title">API Execution Warning</h4>
-      <p class="text-sm text-slate-400 mt-2 leading-relaxed" id="modal-description">
+      <h4 class="text-xl font-black text-white" id="modal-title">API Execution Warning</h4>
+      <p class="text-sm text-slate-350 mt-2 leading-relaxed" id="modal-description">
         Something went wrong.
       </p>
       <div class="mt-6 flex space-x-3">
-        <button onclick="closeModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2 px-4 rounded-xl text-xs transition border border-slate-750">
+        <button onclick="closeModal()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold py-2.5 px-4 rounded-xl text-xs transition border border-slate-800">
           Acknowledge
         </button>
-        <button onclick="forceDemoTrigger()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-xl text-xs transition">
+        <button onclick="forceDemoTrigger()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-md shadow-indigo-600/10">
           Run Demo Sandbox
         </button>
       </div>
@@ -655,39 +708,39 @@
   </div>
 
   <!-- Developer Console Modal -->
-  <div id="admin-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl relative space-y-4">
-      <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
-        <div class="h-8 w-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
-          <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <div id="admin-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl relative space-y-4 border border-slate-800 animate-fade-in-up">
+      <div class="flex items-center space-x-3 border-b border-slate-900 pb-3">
+        <div class="h-9 w-9 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20 shadow-sm">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
           </svg>
         </div>
-        <h4 class="text-base font-bold text-white">Developer Configuration Panel</h4>
+        <h4 class="text-base font-extrabold text-white">Developer Configuration Panel</h4>
       </div>
       
-      <p class="text-xs text-slate-400">
+      <p class="text-xs text-slate-400 leading-relaxed">
         Configure variables securely inside your browser's private local storage. These inputs will never be exposed to your end-users.
       </p>
 
-      <div class="space-y-3">
+      <div class="space-y-4">
         <div>
-          <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Make.com Webhook URL Override</label>
-          <input type="text" id="adminWebhookUrl" placeholder="https://hook.us2.make.com/..." class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 font-mono focus:border-indigo-500 outline-none">
-          <p class="text-[9px] text-slate-500 mt-1">Leave blank to run client-side intelligence analysis directly.</p>
+          <label class="block text-[10px] text-slate-450 font-black uppercase mb-1.5 tracking-wider">Make.com Webhook URL Override</label>
+          <input type="text" id="adminWebhookUrl" placeholder="https://hook.us2.make.com/..." class="w-full bg-slate-955 border border-slate-900 rounded-lg px-3 py-2 text-xs text-slate-303 font-mono focus:border-indigo-500 outline-none shadow-inner">
+          <p class="text-[9px] text-slate-500 mt-1">Leave blank to use the active direct Gemini connection.</p>
         </div>
         <div>
-          <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Optional Gemini API Key (Direct Connection)</label>
-          <input type="password" id="adminApiKey" placeholder="AIzaSy..." class="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 font-mono focus:border-indigo-500 outline-none">
-          <p class="text-[9px] text-slate-500 mt-1">If specified, saves directly into your window's session memory to prevent external routing logs.</p>
+          <label class="block text-[10px] text-slate-455 font-black uppercase mb-1.5 tracking-wider">Optional Gemini API Key (Direct Connection)</label>
+          <input type="password" id="adminApiKey" placeholder="AIzaSy..." class="w-full bg-slate-955 border border-slate-900 rounded-lg px-3 py-2 text-xs text-slate-303 font-mono focus:border-indigo-500 outline-none shadow-inner">
+          <p class="text-[9px] text-slate-500 mt-1">If specified, saves directly into your window's session memory to override the default system connection.</p>
         </div>
       </div>
 
-      <div class="flex space-x-3 pt-2">
-        <button onclick="closeAdminConsole()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2 px-4 rounded-xl text-xs transition border border-slate-750">
+      <div class="flex space-x-3 pt-3">
+        <button onclick="closeAdminConsole()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold py-2.5 px-4 rounded-xl text-xs transition border border-slate-800">
           Cancel
         </button>
-        <button onclick="saveAdminSettings()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-xl text-xs transition">
+        <button onclick="saveAdminSettings()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-md shadow-indigo-600/15">
           Save Secure Config
         </button>
       </div>
@@ -699,6 +752,9 @@
     // Initialize PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
+    // Global Environment API Key (provided seamlessly at runtime by environment context)
+    const apiKey = "";
+
     // Global Application State Store
     const State = {
       activeUtilTab: 'upload',
@@ -708,8 +764,7 @@
       extractedContractText: "",
       analysisResults: null,
       chatHistory: [],
-      currentFilter: 'ALL',
-      apiKey: "" // Set to empty string, environment provides runtime fallback
+      currentFilter: 'ALL'
     };
 
     // Preloaded High-Exposure Sandbox Scenarios
@@ -931,13 +986,13 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
       const trapsPanel = document.getElementById('utilpanel-traps');
 
       if (tab === 'upload') {
-        uploadTab.className = 'flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all duration-200 bg-indigo-600 text-white shadow-md';
-        trapsTab.className = 'flex-1 text-center py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-200';
+        uploadTab.className = 'flex-1 text-center py-2.5 text-xs font-bold rounded-lg transition-all duration-300 bg-indigo-600 text-white shadow-md';
+        trapsTab.className = 'flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-slate-450 hover:text-slate-200 transition-all duration-300';
         uploadPanel.classList.remove('hidden');
         trapsPanel.classList.add('hidden');
       } else {
-        trapsTab.className = 'flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all duration-200 bg-indigo-600 text-white shadow-md';
-        uploadTab.className = 'flex-1 text-center py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-200';
+        trapsTab.className = 'flex-1 text-center py-2.5 text-xs font-bold rounded-lg transition-all duration-300 bg-indigo-600 text-white shadow-md';
+        uploadTab.className = 'flex-1 text-center py-2.5 text-xs font-bold rounded-lg text-slate-450 hover:text-slate-200 transition-all duration-300';
         trapsPanel.classList.remove('hidden');
         uploadPanel.classList.add('hidden');
       }
@@ -953,13 +1008,13 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
       const textContainer = document.getElementById('text-container');
 
       if (tab === 'upload') {
-        uploadBtn.className = 'flex-1 text-center py-1.5 text-[11px] font-bold rounded transition bg-indigo-600/80 text-white';
-        textBtn.className = 'flex-1 text-center py-1.5 text-[11px] font-bold rounded text-slate-400 hover:text-slate-200 transition';
+        uploadBtn.className = 'flex-1 text-center py-2 text-[11px] font-bold rounded transition bg-indigo-600/80 text-white shadow';
+        textBtn.className = 'flex-1 text-center py-2 text-[11px] font-bold rounded text-slate-450 hover:text-slate-200 transition';
         uploadContainer.classList.remove('hidden');
         textContainer.classList.add('hidden');
       } else {
-        textBtn.className = 'flex-1 text-center py-1.5 text-[11px] font-bold rounded transition bg-indigo-600/80 text-white';
-        uploadBtn.className = 'flex-1 text-center py-1.5 text-[11px] font-bold rounded text-slate-400 hover:text-slate-200 transition';
+        textBtn.className = 'flex-1 text-center py-2 text-[11px] font-bold rounded transition bg-indigo-600/80 text-white shadow';
+        uploadBtn.className = 'flex-1 text-center py-2 text-[11px] font-bold rounded text-slate-450 hover:text-slate-200 transition';
         textContainer.classList.remove('hidden');
         uploadContainer.classList.add('hidden');
       }
@@ -973,10 +1028,11 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
         const btn = document.getElementById(`subtab-${t}`);
         const panel = document.getElementById(`panel-${t}`);
         if (t === subtab) {
-          btn.className = 'text-center py-2 text-[10px] font-bold rounded-lg transition-all duration-150 bg-indigo-600 text-white flex items-center justify-center space-x-0.5';
+          btn.className = 'text-center py-2.5 text-[10px] font-bold rounded-lg transition-all duration-150 bg-indigo-600 text-white flex items-center justify-center space-x-1 shadow-md';
           if (panel) panel.classList.remove('hidden');
         } else {
-          btn.className = 'text-center py-2 text-[10px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-150 flex items-center justify-center space-x-0.5';
+          btn.className = 'text-center py-2.5 text-[10px] font-bold rounded-lg text-slate-455 hover:text-slate-200 transition-all duration-150 flex items-center justify-center space-x-1';
+          if (panel) panel.className += ' hover:bg-slate-900/40'; 
           if (panel) panel.classList.add('hidden');
         }
       });
@@ -999,6 +1055,7 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
       showToast(`Selected contract file: ${file.name}`);
     }
 
+    // Reset Dropzone Input File Selection
     function resetFileSelection(event) {
       if (event) event.stopPropagation();
       State.uploadedFile = null;
@@ -1025,10 +1082,10 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
     function showToast(message) {
       const container = document.getElementById('notification-hub');
       const toast = document.createElement('div');
-      toast.className = 'bg-slate-900 border border-slate-800 text-slate-200 text-xs px-4 py-2.5 rounded-xl shadow-2xl flex items-center space-x-2 animate-slide-in pointer-events-auto transition duration-300';
+      toast.className = 'bg-slate-950/90 border border-slate-800 text-slate-200 text-xs px-4.5 py-3 rounded-xl shadow-2xl flex items-center space-x-2.5 animate-slide-in pointer-events-auto transition duration-300 border-indigo-500/10 hover:border-indigo-500/25';
       toast.innerHTML = `
-        <span class="h-1.5 w-1.5 rounded-full bg-indigo-500"></span>
-        <span>${message}</span>
+        <span class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
+        <span class="font-medium">${message}</span>
       `;
       container.appendChild(toast);
       setTimeout(() => {
@@ -1069,10 +1126,10 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
 
     function saveAdminSettings() {
       const webhook = document.getElementById('adminWebhookUrl').value.trim();
-      const apiKey = document.getElementById('adminApiKey').value.trim();
+      const userApiKey = document.getElementById('adminApiKey').value.trim();
       
       localStorage.setItem('legisshield_webhook', webhook);
-      localStorage.setItem('legisshield_apikey', apiKey);
+      localStorage.setItem('legisshield_apikey', userApiKey);
       
       closeAdminConsole();
       showToast("Config variables updated successfully in secure session storage.");
@@ -1080,16 +1137,16 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
     }
 
     function updateConnectionIndicator() {
-      const apikey = localStorage.getItem('legisshield_apikey');
+      const customApiKey = localStorage.getItem('legisshield_apikey');
       const dot = document.getElementById('connection-dot');
       const txt = document.getElementById('connection-text');
 
-      if (apikey) {
+      if (customApiKey) {
         dot.className = "h-2 w-2 rounded-full bg-cyan-400 animate-pulse";
-        txt.innerText = "Direct AI API Connected";
+        txt.innerText = "Developer API Override Enabled";
       } else {
-        dot.className = "h-2 w-2 rounded-full bg-emerald-500 animate-pulse";
-        txt.innerText = "Fail-Safe AI Enabled";
+        dot.className = "h-2 w-2 rounded-full bg-indigo-500 animate-pulse";
+        txt.innerText = "Direct Gemini AI Active";
       }
     }
 
@@ -1132,22 +1189,22 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
           if (forceMockData) {
             State.analysisResults = forceMockData;
           } else {
-            // Attempt Gemini Direct API analysis if API key is provided, or route to webhook, otherwise fall back to fail-safe analysis
-            const userApiKey = localStorage.getItem('legisshield_apikey');
             const userWebhook = localStorage.getItem('legisshield_webhook');
+            const customApiKey = localStorage.getItem('legisshield_apikey');
 
-            if (userApiKey) {
-              State.analysisResults = await runGeminiDirectAnalysis(userApiKey, textToAnalyze);
-            } else if (userWebhook) {
+            if (userWebhook) {
               State.analysisResults = await runWebhookAnalysis(userWebhook, textToAnalyze);
+            } else if (customApiKey) {
+              State.analysisResults = await runGeminiDirectAnalysis(customApiKey, textToAnalyze);
             } else {
-              State.analysisResults = generateFailsafeMockResults(textToAnalyze);
+              // Priority Behavior: Default to running the live system Gemini connection with zero roadblocks!
+              State.analysisResults = await runGeminiDirectAnalysis(apiKey, textToAnalyze);
             }
           }
           renderResults(State.analysisResults);
         } catch (err) {
-          console.error(err);
-          showToast("AI extraction failed. Initiating Fail-Safe local intelligence mapping.");
+          console.error("AI analysis call encountered error:", err);
+          showToast("Direct AI call timed out or failed. Initiating localized safety analyzer.");
           State.analysisResults = generateFailsafeMockResults(textToAnalyze);
           renderResults(State.analysisResults);
         }
@@ -1189,7 +1246,7 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
 
       if (state === "completed") {
         row.style.opacity = "1";
-        dot.className = "h-5 w-5 rounded-full flex items-center justify-center bg-emerald-500 text-white font-bold";
+        dot.className = "h-6 w-6 rounded-full flex items-center justify-center bg-emerald-500 text-white font-black text-[10px]";
         dot.innerHTML = `
           <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
@@ -1198,22 +1255,39 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
         text.innerText = statusText;
       } else if (state === "active") {
         row.style.opacity = "1";
-        dot.className = "h-5 w-5 rounded-full flex items-center justify-center bg-indigo-500 text-white font-bold animate-pulse";
+        dot.className = "h-6 w-6 rounded-full flex items-center justify-center bg-indigo-500 text-white font-black text-[10px] animate-pulse";
         dot.innerHTML = stepNum;
         text.innerText = statusText;
         document.getElementById('loader-status').innerText = statusText;
       }
     }
 
+    // Robust JSON cleaning utility in case markdown formatting blocks parsing
+    function parseRobustJSON(text) {
+      if (!text) return null;
+      let cleaned = text.trim();
+      if (cleaned.startsWith("```json")) {
+        cleaned = cleaned.substring(7);
+      } else if (cleaned.startsWith("```")) {
+        cleaned = cleaned.substring(3);
+      }
+      
+      if (cleaned.endsWith("```")) {
+        cleaned = cleaned.substring(0, cleaned.length - 3);
+      }
+      
+      return JSON.parse(cleaned.trim());
+    }
+
     // GEMINI DIRECT CALLS (with exponential backoff and structured output schema)
-    async function runGeminiDirectAnalysis(apiKey, text) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-      const systemInstruction = `You are a legendary general counsel and risk auditor. Break down the provided contract into detailed business liabilities, critical risks, and custom protection redline clauses. You MUST respond ONLY with a clean, unformatted JSON object. Never include markdown tags around the JSON in your response.`;
+    async function runGeminiDirectAnalysis(apiConnectionKey, text) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiConnectionKey}`;
+      const systemInstruction = `You are an expert general counsel and transaction auditor. Map the uploaded legal text into a high-fidelity risk dashboard. You MUST reply ONLY with a fully populated JSON object fitting the expected client schema structure. Do not embed instructions, code block ticks, or markdown scripts inside your response.`;
       
       const payload = {
         contents: [{
           parts: [{
-            text: `Analyze this contract:\n\n${text.substring(0, 8000)}`
+            text: `Audit the following agreement terms for corporate risks, missing clauses, and negotiation parameters:\n\n${text.substring(0, 15000)}`
           }]
         }],
         systemInstruction: {
@@ -1311,7 +1385,7 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
 
       const response = await fetchWithRetry(url, payload);
       const jsonText = response.candidates?.[0]?.content?.parts?.[0]?.text;
-      return JSON.parse(jsonText);
+      return parseRobustJSON(jsonText);
     }
 
     async function runWebhookAnalysis(webhookUrl, text) {
@@ -1346,12 +1420,12 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
       throw new Error("API call timed out after maximum retry limit.");
     }
 
-    // Fail-Safe Intelligence Model (Runs entirely locally in the browser context)
+    // Fail-Safe Intelligence Model (Fallback backup when offline or rate-limited)
     function generateFailsafeMockResults(text) {
       const lowercaseText = text.toLowerCase();
       let type = "Commercial Agreement";
       let score = 55;
-      let summary = "The legal agreement was mapped successfully. Several risk mitigation redlines have been created to secure internal operational protections.";
+      let summary = "The legal agreement was mapped successfully locally. Several risk mitigation redlines have been created to secure internal operational protections.";
       let liabilityScore = 60;
       let ipScore = 70;
       let venueScore = 65;
@@ -1494,20 +1568,20 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
         }
       }, 10);
 
-      // SVG Dasharray calculation
-      const perimeter = 2 * Math.PI * 40; // ~251.2
+      // SVG Dasharray calculation (outer radius 41)
+      const perimeter = 2 * Math.PI * 41; // ~257.6
       const offset = perimeter - (perimeter * target) / 100;
       ring.style.strokeDashoffset = offset;
 
       // Update badge coloring
       if (target >= 75) {
-        badge.className = "mt-4 px-3 py-1 rounded-full text-xs font-semibold bg-red-950/40 text-red-400 border border-red-500/20";
+        badge.className = "mt-4 px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest bg-rose-955/40 text-rose-400 border border-rose-500/30 shadow-sm";
         badge.innerText = "SEVERE RISK";
       } else if (target >= 50) {
-        badge.className = "mt-4 px-3 py-1 rounded-full text-xs font-semibold bg-amber-950/40 text-amber-400 border border-amber-500/20";
+        badge.className = "mt-4 px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest bg-amber-955/40 text-amber-400 border border-amber-500/30 shadow-sm";
         badge.innerText = "MEDIUM RISK";
       } else {
-        badge.className = "mt-4 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/40 text-emerald-400 border border-emerald-500/20";
+        badge.className = "mt-4 px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest bg-emerald-955/40 text-emerald-400 border border-emerald-500/30 shadow-sm";
         badge.innerText = "SAFE COVENANT";
       }
 
@@ -1523,7 +1597,7 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
       document.getElementById('bar-ip').style.width = `${res.metrics?.ipSafety || 50}%`;
 
       document.getElementById('metric-jurisdiction').innerText = `${res.metrics?.disputeSovereignty || 50}%`;
-      document.getElementById('bar-jurisdiction').style.width = `${res.metrics?.disputeSovereignty || 50}%`;
+      document.getElementById('bar-jurisdiction').style.width = `${res.metrics?.disputeSovereignty || 55}%`;
 
       // 4. Badges count
       document.getElementById('badge-count-risks').innerText = res.redlines?.length || 0;
@@ -1562,30 +1636,37 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
 
       redlines.forEach((r, idx) => {
         let sevColor = "text-rose-400 bg-rose-500/10 border-rose-500/15";
-        if (r.severity === "MEDIUM") sevColor = "text-amber-400 bg-amber-500/10 border-amber-500/15";
-        if (r.severity === "LOW") sevColor = "text-blue-400 bg-blue-500/10 border-blue-500/15";
+        let leftAccent = "border-l-4 border-rose-500";
+        if (r.severity === "MEDIUM") {
+          sevColor = "text-amber-400 bg-amber-500/10 border-amber-500/15";
+          leftAccent = "border-l-4 border-amber-500";
+        }
+        if (r.severity === "LOW") {
+          leftAccent = "border-l-4 border-blue-500";
+          sevColor = "text-blue-400 bg-blue-500/10 border-blue-500/15";
+        }
 
         const card = document.createElement('div');
-        card.className = "p-4 glass-panel rounded-xl border border-slate-850 space-y-3 relative overflow-hidden transition-all duration-200 hover:border-slate-800";
+        card.className = `p-5 glass-panel rounded-xl border-slate-900 ${leftAccent} space-y-4 relative overflow-hidden transition-all duration-300 hover:border-slate-800 hover:-translate-y-1 shadow-md animate-fade-in-up`;
         card.setAttribute('data-severity', r.severity);
         card.innerHTML = `
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded border ${sevColor}">
+            <span class="text-[9px] font-black tracking-widest px-2.5 py-1 rounded border ${sevColor}">
               ${r.severity} EXPOSURE
             </span>
-            <button onclick="copyNegotiationText('redline-${idx}', 'btn-copy-redline-${idx}')" id="btn-copy-redline-${idx}" class="text-[10px] text-slate-500 hover:text-slate-300 transition flex items-center space-x-1">
-              <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button onclick="copyNegotiationText('redline-${idx}', 'btn-copy-redline-${idx}')" id="btn-copy-redline-${idx}" class="text-[10px] text-slate-400 hover:text-indigo-400 transition-all flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900/60 border border-slate-850 hover:border-indigo-500/10 shadow-sm">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"></path>
               </svg>
-              <span>Copy Redline</span>
+              <span class="font-bold">Copy Redline</span>
             </button>
           </div>
-          <div class="space-y-1">
-            <h4 class="text-xs font-bold text-white">${r.clause}</h4>
-            <p class="text-xs text-slate-400 leading-relaxed">${r.implication}</p>
+          <div class="space-y-1.5">
+            <h4 class="text-sm font-extrabold text-white tracking-tight">${r.clause}</h4>
+            <p class="text-xs text-slate-355 leading-relaxed">${r.implication}</p>
           </div>
-          <div class="p-3 bg-slate-950/80 rounded-lg border border-slate-900">
-            <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest block mb-1">Proposed Redline</span>
+          <div class="p-3.5 bg-slate-955/80 rounded-lg border border-slate-900 shadow-inner">
+            <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest block mb-1.5">Proposed Redline Amendment</span>
             <code id="redline-${idx}" class="text-xs font-mono text-slate-300 select-all block leading-relaxed">${r.redline}</code>
           </div>
         `;
@@ -1602,9 +1683,9 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
       severities.forEach(s => {
         const btn = document.getElementById(`filter-${s}`);
         if (s.toUpperCase() === severity) {
-          btn.className = "px-2.5 py-1 rounded bg-indigo-600 text-[10px] font-semibold text-white transition hover:bg-indigo-500";
+          btn.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-[10px] font-extrabold text-white transition hover:bg-indigo-500 shadow-sm";
         } else {
-          btn.className = "px-2.5 py-1 rounded bg-slate-900/60 text-[10px] font-semibold text-slate-400 border border-slate-800/60 hover:bg-slate-800 transition";
+          btn.className = "px-3 py-1.5 rounded-lg bg-slate-900/60 text-[10px] font-extrabold text-slate-400 border border-slate-850 hover:bg-slate-800 transition";
         }
       });
 
@@ -1638,23 +1719,23 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
 
       missing.forEach((m, idx) => {
         const card = document.createElement('div');
-        card.className = "p-4 glass-panel rounded-xl border border-slate-850 space-y-3 relative";
+        card.className = "p-5 glass-panel rounded-xl border border-slate-900 border-l-4 border-l-indigo-500 space-y-4 relative transition-all duration-300 hover:border-slate-800 hover:-translate-y-1 shadow-md animate-fade-in-up";
         card.innerHTML = `
           <div class="flex items-center justify-between">
-            <h4 class="text-xs font-bold text-white flex items-center space-x-2">
-              <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
-              <span>${m.name}</span>
+            <h4 class="text-sm font-extrabold text-white flex items-center space-x-2.5">
+              <span class="h-2 w-2 rounded-full bg-indigo-400 animate-pulse"></span>
+              <span class="tracking-tight">${m.name}</span>
             </h4>
-            <button onclick="copyNegotiationText('missing-${idx}', 'btn-copy-missing-${idx}')" id="btn-copy-missing-${idx}" class="text-[10px] text-slate-500 hover:text-slate-300 transition flex items-center space-x-1">
-              <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button onclick="copyNegotiationText('missing-${idx}', 'btn-copy-missing-${idx}')" id="btn-copy-missing-${idx}" class="text-[10px] text-slate-400 hover:text-indigo-400 transition-all flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900/60 border border-slate-850 hover:border-indigo-500/10 shadow-sm">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"></path>
               </svg>
-              <span>Copy Draft</span>
+              <span class="font-bold">Copy Draft</span>
             </button>
           </div>
-          <p class="text-xs text-slate-400 leading-relaxed">${m.whyNeeded}</p>
-          <div class="p-3 bg-slate-950/80 rounded-lg border border-slate-900">
-            <span class="text-[9px] font-bold text-cyan-400 uppercase tracking-widest block mb-1">Recommended Insert Draft</span>
+          <p class="text-xs text-slate-355 leading-relaxed">${m.whyNeeded}</p>
+          <div class="p-3.5 bg-slate-955/80 rounded-lg border border-slate-900 shadow-inner">
+            <span class="text-[9px] font-black text-cyan-400 uppercase tracking-widest block mb-1.5">Recommended Provision Insertion</span>
             <code id="missing-${idx}" class="text-xs font-mono text-slate-300 select-all block leading-relaxed">${m.recommendedDraft}</code>
           </div>
         `;
@@ -1684,16 +1765,16 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
         const leveragePoints = results.negotiation?.leveragePoints || [];
         leveragePoints.forEach(p => {
           const div = document.createElement('div');
-          div.className = "p-3 bg-slate-900/30 rounded-xl border border-slate-850 flex items-start space-x-3";
+          div.className = "p-4 bg-slate-900/30 rounded-xl border border-slate-900 hover:border-slate-800 transition-all duration-200 flex items-start space-x-3.5 shadow-sm";
           div.innerHTML = `
-            <span class="p-1 rounded bg-indigo-500/10 text-indigo-400 mt-0.5">
-              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 mt-0.5 shadow-inner">
+              <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4"></path>
               </svg>
             </span>
             <div>
-              <p class="text-xs font-bold text-white">${p.title}</p>
-              <p class="text-[11px] text-slate-400 leading-relaxed mt-0.5">${p.description}</p>
+              <p class="text-xs font-extrabold text-white tracking-tight">${p.title}</p>
+              <p class="text-[11px] text-slate-355 leading-relaxed mt-1">${p.description}</p>
             </div>
           `;
           leverageContainer.appendChild(div);
@@ -1740,11 +1821,11 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
 
     function setComplianceBadgeColor(badge, status) {
       if (status === "COMPLIANT") {
-        badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+        badge.className = "px-3 py-1 rounded-lg text-[10px] font-black tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm";
       } else if (status === "WARNING") {
-        badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20";
+        badge.className = "px-3 py-1 rounded-lg text-[10px] font-black tracking-widest bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-sm";
       } else {
-        badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20";
+        badge.className = "px-3 py-1 rounded-lg text-[10px] font-black tracking-widest bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-sm";
       }
     }
 
@@ -1766,25 +1847,25 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
         const decks = results.boardDeck || [];
         decks.forEach((slide, idx) => {
           const slideDiv = document.createElement('div');
-          slideDiv.className = "p-5 glass-panel rounded-xl border border-slate-850 space-y-3 relative";
+          slideDiv.className = "p-5 glass-panel rounded-xl border border-slate-900 border-l-4 border-l-indigo-500/80 space-y-4 relative hover:border-slate-800 hover:-translate-y-1 transition-all duration-300 shadow-md animate-fade-in-up";
           
           let bulletPointsHTML = "";
           slide.points.forEach(pt => {
             bulletPointsHTML += `
-              <li class="flex items-start space-x-2.5 text-xs text-slate-300 leading-relaxed">
-                <span class="h-1.5 w-1.5 rounded-full bg-indigo-400 mt-2 shrink-0"></span>
+              <li class="flex items-start space-x-3 text-xs text-slate-350 leading-relaxed">
+                <span class="h-1.5 w-1.5 rounded-full bg-indigo-400 mt-2 shrink-0 animate-pulse"></span>
                 <span>${pt}</span>
               </li>
             `;
           });
 
           slideDiv.innerHTML = `
-            <div class="flex items-center justify-between border-b border-slate-900 pb-2">
-              <span class="text-[9px] uppercase font-black text-indigo-400 tracking-wider">Stakeholder Slide #${idx + 1}</span>
-              <span class="text-[10px] text-slate-500 font-mono">LegisShield Presentation Blueprint</span>
+            <div class="flex items-center justify-between border-b border-slate-900 pb-2.5">
+              <span class="text-[9px] uppercase font-black text-indigo-400 tracking-widest">Stakeholder Slide #${idx + 1}</span>
+              <span class="text-[9px] text-slate-500 font-mono tracking-wider font-bold">LegisShield Board Blueprint</span>
             </div>
-            <h4 class="text-sm font-bold text-white mt-1">${slide.slideTitle}</h4>
-            <ul class="space-y-2 mt-3 pl-1">
+            <h4 class="text-sm font-extrabold text-white tracking-tight mt-1">${slide.slideTitle}</h4>
+            <ul class="space-y-2.5 mt-3 pl-1">
               ${bulletPointsHTML}
             </ul>
           `;
@@ -1813,7 +1894,7 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
         if (input.toLowerCase().includes("indemnity") || input.toLowerCase().includes("hold harmless")) {
           resultText = "⚠️ THE LITIGATION TRAP: The counterparty wants you to reimburse them for any damages, legal costs, or settlements, even if they were partially at fault. This is non-standard for basic exchanges and can easily bankrupt a growing vendor entity without strict insurance policy offsets.";
         } else if (input.toLowerCase().includes("perpetual") || input.toLowerCase().includes("survive")) {
-          resultText = "⚠️ THE PERPETUAL obligation: They are locking your engineering, sales, and product divisions to a lifelong obligation. This means they can claim breach of confidentiality 10 years from now, blocking your operational flexibility long after partnerships terminate.";
+          resultText = "⚠️ THE PERPETUAL OBLIGATION: They are locking your engineering, sales, and product divisions to a lifelong obligation. This means they can claim breach of confidentiality 10 years from now, blocking your operational flexibility long after partnerships terminate.";
         } else if (input.toLowerCase().includes("arbitration") || input.toLowerCase().includes("venue")) {
           resultText = "⚠️ JURISDICTION EXPOSURE: If a legal dispute breaks out, your localized legal counsel must fly out to external courts under unknown state statutes. Always bargain for localized neutral jurisdictions.";
         }
@@ -1855,11 +1936,12 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
       chatContainer.scrollTop = chatContainer.scrollHeight;
 
       try {
-        const apikey = localStorage.getItem('legisshield_apikey');
+        const customApiKey = localStorage.getItem('legisshield_apikey');
+        const activeKey = customApiKey || apiKey; // Leverage environment-supplied runtime key if custom key is absent
         let reply = "";
 
-        if (apikey && State.extractedContractText) {
-          reply = await fetchGeminiChatReply(apikey, State.extractedContractText, text, State.chatHistory);
+        if (State.extractedContractText) {
+          reply = await fetchGeminiChatReply(activeKey, State.extractedContractText, text, State.chatHistory);
         } else {
           // Local semantic fallback answers
           reply = generateFailsafeChatResponse(text);
@@ -1879,23 +1961,23 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
     function appendMessage(sender, text, uniqueId = null) {
       const container = document.getElementById('chat-messages');
       const wrapper = document.createElement('div');
-      wrapper.className = "flex items-start space-x-2.5";
+      wrapper.className = "flex items-start space-x-2.5 animate-fade-in-up";
 
       if (sender === "user") {
         wrapper.innerHTML = `
-          <div class="h-7 w-7 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">
+          <div class="h-8 w-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xs font-black shrink-0 border border-indigo-500/25 shadow-sm">
             ME
           </div>
-          <div class="bg-slate-950/60 rounded-xl p-3 border border-slate-900 text-xs text-slate-300 leading-relaxed max-w-[85%] select-text">
+          <div class="bg-slate-950/60 rounded-xl p-3.5 border border-slate-900 text-xs text-slate-350 leading-relaxed max-w-[85%] select-text shadow-inner">
             ${text}
           </div>
         `;
       } else {
         wrapper.innerHTML = `
-          <div class="h-7 w-7 rounded-lg bg-cyan-600/10 text-cyan-400 flex items-center justify-center text-xs font-bold shrink-0">
+          <div class="h-8 w-8 rounded-lg bg-cyan-600/10 text-cyan-400 flex items-center justify-center text-xs font-black shrink-0 border border-cyan-500/25 shadow-sm">
             AI
           </div>
-          <div id="${uniqueId || ''}" class="bg-slate-900/40 rounded-xl p-3 border border-slate-850 text-xs text-slate-200 leading-relaxed max-w-[85%] select-text">
+          <div id="${uniqueId || ''}" class="bg-slate-900/40 rounded-xl p-3.5 border border-slate-850 text-xs text-slate-200 leading-relaxed max-w-[85%] select-text shadow-sm">
             ${text}
           </div>
         `;
@@ -1904,8 +1986,8 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
       container.appendChild(wrapper);
     }
 
-    async function fetchGeminiChatReply(apiKey, contractText, query, history) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+    async function fetchGeminiChatReply(apiConnectionKey, contractText, query, history) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiConnectionKey}`;
       const systemInstruction = `You are an interactive legal assistant grounded inside the analyzed contract text. Be concise, precise, and practical. Provide strategic corporate instructions directly. Here is the contract:\n\n${contractText.substring(0, 10000)}`;
 
       // Compile conversation structure
@@ -1961,17 +2043,17 @@ This Enterprise Agreement (the "Agreement") governs the subscription and deploym
         
         // Update button text to show completed feedback
         const btn = document.getElementById(buttonId);
-        const originalText = btn.innerHTML;
+        const originalHTML = btn.innerHTML;
         btn.innerHTML = `
-          <svg class="h-3 w-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="h-3.5 w-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
           </svg>
-          <span class="text-emerald-400">Copied!</span>
+          <span class="text-emerald-400 font-bold">Copied!</span>
         `;
         setTimeout(() => {
-          btn.innerHTML = originalText;
+          btn.innerHTML = originalHTML;
         }, 2000);
-        showToast("Text copied directly into clip-buffer.");
+        showToast("Text copied directly into clipboard.");
       } catch (err) {
         showToast("System permissions blocked clipboard actions. Please highlight the text to copy.");
       }
